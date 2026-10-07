@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Laporan Dokumentasi Kerja</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome untuk Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 untuk Notifikasi Profesional -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e40af',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER / NAVBAR -->
+    <header id="header-nav" class="bg-white shadow-sm hidden sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                    <i class="fa-solid fa-camera-retro"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900 leading-tight">Dokumentasi Kerja</h1>
+                    <p class="text-xs text-slate-500" id="user-role-badge">Sistem Pelaporan Mandiri</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Indikator Kecepatan Jaringan -->
+                <div class="hidden sm:flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600">
+                    <span id="network-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="network-status">Memeriksa Jaringan...</span>
+                </div>
+                
+                <div class="flex items-center space-x-2 border-l pl-4 border-slate-200">
+                    <span id="display-username" class="font-semibold text-sm text-slate-700"></span>
+                    <button onclick="logout()" class="bg-rose-50 text-rose-600 hover:bg-rose-100 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+
+        <!-- KELOMPOK 1: HALAMAN LOGIN -->
+        <section id="login-section" class="max-w-md mx-auto mt-10 bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
+            <div class="text-center mb-6">
+                <!-- Logo PNG -->
+                <img src="logo.png" alt="logo" class="w-20 h-20 mx-auto mb-3 object-contain">
+                <h2 class="text-2xl font-bold text-slate-900">Selamat Datang</h2>
+                <p class="text-sm text-slate-500 mt-1">Silakan masuk menggunakan akun Anda</p>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Username</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="login-username" required placeholder="Username" 
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="login-password" required placeholder="Masukkan password" 
+                            class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
+                        <!-- Tanda Mata Password -->
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                            <i id="eye-icon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="login-error" class="hidden text-xs text-rose-600 bg-rose-50 p-2.5 rounded-lg text-center font-medium"></div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition shadow-lg shadow-blue-500/25">
+                    Masuk ke Sistem
+                </button>
+            </form>
+
+            <div class="mt-6 border-t pt-4 text-xs text-slate-400 text-center">
+               
+        </section>
+
+        <!-- KELOMPOK 2: DASHBOARD USER & ADMIN -->
+        <section id="dashboard-section" class="hidden space-y-6">
+            <!-- Welcome Banner -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 id="welcome-message" class="text-2xl font-bold">Selamat Datang</h2>
+                    <p class="text-blue-100 text-sm mt-1">Sistem Pengunggahan & Arsip Dokumentasi Kerja Harian</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl text-xs font-medium border border-white/20">
+                    <span id="current-date-label"></span>
+                </div>
+            </div>
+
+            <!-- TAB CONTAINER UNTUK USER & ADMIN -->
+            <div id="user-panel" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Form Upload User / Admin -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-lg text-slate-900 mb-4 flex items-center">
+                        <i class="fa-solid fa-cloud-arrow-up text-blue-600 mr-2"></i> Upload Dokumentasi
+                    </h3>
+                    <form id="upload-form" onsubmit="handleUpload(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Tanggal Laporan</label>
+                            <input type="date" id="input-tanggal-laporan" required 
+                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Instansi / Unit Kerja</label>
+                            <input type="text" id="input-instansi" value="SPPG KOTA SERANG SERANG SERANG 2" readonly required
+                                class="w-full px-3 py-2 bg-slate-100 text-slate-600 border border-slate-200 rounded-xl text-sm focus:outline-none cursor-not-allowed">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Jenis Foto Dokumentasi</label>
+                            <select id="input-kategori" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                                <option value="">-- Pilih Jenis Dokumentasi --</option>
+                                <option value="FOTO SERAH TERIMA SCURITY">FOTO SERAH TERIMA SCURITY</option>
+                                <option value="FOTO ABSENSI RELAWAN">FOTO ABSENSI RELAWAN</option>
+                                <option value="FOTO PENERIMAANABAHAN BAKU">FOTO PENERIMAANABAHAN BAKU</option>
+                                <option value="FOTO BAHAN BAKU">FOTO BAHAN BAKU</option>
+                                <option value="FOTO LIMBAH RIJEK PERSIAPAN">FOTO LIMBAH RIJEK PERSIAPAN</option>
+                                <option value="FOTO TIMBANGAN LIMBAH B3">FOTO TIMBANGAN LIMBAH B3</option>
+                                <option value="RUANGAN / AREA DAPUR">RUANGAN / AREA DAPUR</option>
+                                <option value="DISTRIBUSI PAGI PENGIRIMAN">DISTRIBUSI PAGI PENGIRIMAN</option>
+                                <option value="FOTO CLEANING SERVICE">FOTO CLEANING SERVICE</option>
+                                <option value="SERAH TERIMA PERSIAPAN - PENGOLAHAN">SERAH TERIMA PERSIAPAN - PENGOLAHAN</option>
+                                <option value="SERAH TERIMA PENGOLAHAN - PEMORSIAN">SERAH TERIMA PENGOLAHAN - PEMORSIAN</option>
+                                <option value="SERAH TERIMA PEMORSIAN - DISTRIBUSI">SERAH TERIMA PEMORSIAN - DISTRIBUSI</option>
+                                <option value="SERAH TERIMA DISTRIBUSI - PENCUCI FOODTRAY">SERAH TERIMA DISTRIBUSI - PENCUCI FOODTRAY</option>
+                                <option value="SERAH TERIMA PENCUCI FOODTRAY - ASLAP">SERAH TERIMA PENCUCI FOODTRAY - ASLAP</option>
+                                <option value="FOTO CUCI KENDARAAN">FOTO CUCI KENDARAAN</option>
+                                <option value="FOTO KENDARAAN">FOTO KENDARAAN</option>
+                                <option value="KERJA TIM PERSIAPAN">KERJA TIM PERSIAPAN</option>
+                                <option value="KERJA TIM PENGOLAHAN">KERJA TIM PENGOLAHAN</option>
+                                <option value="KERJA TIM PEMORSIAN">KERJA TIM PEMORSIAN</option>
+                                <option value="KERJA TIM PENCUCI FOODTRAY">KERJA TIM PENCUCI FOODTRAY</option>
+                                <option value="FOTO GALON DAN GAS">FOTO GALON DAN GAS</option>
+                                <option value="FOTO LIMBAH SISA PEMORSIAN">FOTO LIMBAH SISA PEMORSIAN</option>
+                                <option value="FOTO LIMBAH SISA OMPRENG">FOTO LIMBAH SISA OMPRENG</option>
+                                <option value="FOTO SAAT PENGAMBILAN TUKANG SAMPAH">FOTO SAAT PENGAMBILAN TUKANG SAMPAH</option>
+                                <option value="FOTO SAAT SO BAHAN BAKU">FOTO SAAT SO BAHAN BAKU</option>
+                                <option value="FOTO SAAT MEMBERSIHKAN IPAL">FOTO SAAT MEMBERSIHKAN IPAL</option>
+                                <option value="FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA">FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Foto (Bisa Lebih dari 1)</label>
+                            <input type="file" id="input-files" multiple accept="image/*" required 
+                                class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                        </div>
+
+                        <button type="submit" id="btn-upload" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition shadow-md">
+                            <i class="fa-solid fa-upload mr-1"></i> Upload Laporan
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Riwayat Arsip User (Hanya tampil untuk User dengan Filter Tanggal) -->
+                <div id="user-archive-container" class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
+                        <h3 class="font-bold text-lg text-slate-900 flex items-center">
+                            <span><i class="fa-solid fa-box-archive text-blue-600 mr-2"></i> Riwayat Arsip Anda</span>
+                            <span id="user-count-badge" class="ml-2 text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium">0 Laporan</span>
+                        </h3>
+                        
+                        <!-- Filter Rentang Tanggal untuk User -->
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Dari</label>
+                                <input type="date" id="user-filter-start-date" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Sampai</label>
+                                <input type="date" id="user-filter-end-date" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                            </div>
+                            <div class="flex items-end space-x-1 pt-3">
+                                <button onclick="applyUserFilter()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs font-medium transition">Filter</button>
+                                <button onclick="resetUserFilter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded-lg text-xs font-medium transition">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="user-archive-list" class="space-y-4 max-h-[450px] overflow-y-auto pr-2">
+                        <!-- Data Arsip Dinamis -->
+                        <p class="text-center text-slate-400 py-10 text-sm">Belum ada riwayat dokumen diunggah.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN PANEL FULL -->
+            <div id="admin-panel" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hidden space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b pb-4">
+                    <h3 class="font-bold text-xl text-slate-900 flex items-center">
+                        <i class="fa-solid fa-shield-halved text-blue-600 mr-2"></i> Panel Kontrol & Arsip Full Admin
+                    </h3>
+                    
+                    <!-- Filter Rentang Tanggal & Instansi -->
+                    <div class="flex flex-wrap gap-3 items-center">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase">Dari Tanggal</label>
+                            <input type="date" id="filter-start-date" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase">Sampai Tanggal</label>
+                            <input type="date" id="filter-end-date" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase">Instansi</label>
+                            <input type="text" id="filter-instansi" placeholder="Cari Instansi..." class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                        </div>
+                        <div class="flex items-end space-x-2">
+                            <button onclick="applyAdminFilter()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition">Filter</button>
+                            <button onclick="resetAdminFilter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabel Data Arsip Admin -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase border-b border-slate-200">
+                                <th class="py-3 px-4">Tanggal & Waktu</th>
+                                <th class="py-3 px-4">Pengguna (Uploader)</th>
+                                <th class="py-3 px-4">Instansi</th>
+                                <th class="py-3 px-4">Jenis Dokumentasi</th>
+                                <th class="py-3 px-4">Foto (Preview)</th>
+                                <th class="py-3 px-4 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-archive-list" class="divide-y divide-slate-100 text-sm">
+                            <tr>
+                                <td colspan="6" class="text-center text-slate-400 py-8">Memuat data arsip...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL PRATINJAU FOTO & TOMBOL UNDUH -->
+    <div id="photo-modal" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4">
+        <div class="relative max-w-4xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-image mr-1 text-blue-600"></i> Pratinjau Foto Dokumentasi</h3>
+                <div class="flex items-center space-x-2">
+                    <a id="modal-download-btn" href="" download="dokumentasi.jpg" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center">
+                        <i class="fa-solid fa-download mr-1"></i> Unduh Foto
+                    </a>
+                    <button onclick="closePhotoModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold px-2">&times;</button>
+                </div>
+            </div>
+            <div class="p-4 flex justify-center items-center bg-slate-900 overflow-hidden">
+                <img id="modal-image-element" src="" alt="Pratinjau Foto" class="max-h-[75vh] object-contain rounded-lg">
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
+        &copy; 2026 Sistem Dokumentasi Kerja. All rights reserved.
+    </footer>
+
+    <!-- FIREBASE SDK & SKRIP UTAMA -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAvQjzU7gv4mQm1bV34Yh9taZLaEvX69Es",
+            authDomain: "dokumentasikerja-b6000.firebaseapp.com",
+            projectId: "dokumentasikerja-b6000",
+            storageBucket: "dokumentasikerja-b6000.firebasestorage.app",
+            messagingSenderId: "680864412160",
+            appId: "1:680864412160:web:30d13ad43dd8bbb3e75ee5",
+            measurementId: "G-PK4PQ878VB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+        window.query = query;
+        window.orderBy = orderBy;
+        window.serverTimestamp = serverTimestamp;
+        
+        initializeAppState();
+    </script>
+
+    <script>
+        const FONNTE_TOKEN = "uJ8CF79nyQaJbPrVGeeE";
+        const FONNTE_TARGET = "6283111399112";
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-tiExkycqhueEVFrhgNYuT02mIBLz-fL2uWnqW6J7YX__H8WVau6dDUFhfUsqBPO3/exec";
+
+        const usersDB = {
+            "Serang": { pass: "Mandiri02srg", role: "admin", name: "Admin" },
+            "Muamar": { pass: "Muamar2", role: "user", name: "Muamar" },
+            "Lili": { pass: "Lili2", role: "user", name: "Lili" }
+        };
+
+        let currentUser = null;
+
+        document.getElementById('current-date-label').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('input-tanggal-laporan').value = new Date().toISOString().split('T')[0];
+        checkNetworkSpeed();
+
+        function checkNetworkSpeed() {
+            const statusText = document.getElementById('network-status');
+            const dot = document.getElementById('network-dot');
+            
+            if (navigator.connection) {
+                const speed = navigator.connection.downlink;
+                if (speed > 5) {
+                    statusText.innerText = `Jaringan Cepat (${speed} Mbps)`;
+                    dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+                } else if (speed > 2) {
+                    statusText.innerText = `Jaringan Stabil (${speed} Mbps)`;
+                    dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse";
+                } else {
+                    statusText.innerText = `Jaringan Lambat (${speed} Mbps)`;
+                    dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse";
+                }
+            } else {
+                statusText.innerText = "Online (Normal)";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+            }
+        }
+
+        function togglePassword() {
+            const passInput = document.getElementById('login-password');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                eyeIcon.className = "fa-solid fa-eye-slash";
+            } else {
+                passInput.type = "password";
+                eyeIcon.className = "fa-solid fa-eye";
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value.trim();
+            const p = document.getElementById('login-password').value;
+            const errBox = document.getElementById('login-error');
+
+            if (usersDB[u] && usersDB[u].pass === p) {
+                currentUser = { username: u, ...usersDB[u] };
+                
+                const now = new Date();
+                const item = {
+                    user: currentUser,
+                    expiry: now.getTime() + (7 * 24 * 60 * 60 * 1000)
+                };
+                localStorage.setItem('currentUserSession', JSON.stringify(item));
+
+                errBox.classList.add('hidden');
+                loadDashboard();
+            } else {
+                errBox.innerText = "Username atau Password salah!";
+                errBox.classList.remove('hidden');
+            }
+        }
+
+        function initializeAppState() {
+            const savedStr = localStorage.getItem('currentUserSession');
+            if (savedStr) {
+                try {
+                    const savedItem = JSON.parse(savedStr);
+                    const now = new Date();
+                    if (now.getTime() < savedItem.expiry) {
+                        currentUser = savedItem.user;
+                        loadDashboard();
+                    } else {
+                        localStorage.removeItem('currentUserSession');
+                    }
+                } catch (err) {
+                    localStorage.removeItem('currentUserSession');
+                }
+            }
+        }
+
+        function loadDashboard() {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('header-nav').classList.remove('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('display-username').innerText = currentUser.name;
+
+            if (currentUser.role === 'admin') {
+                document.getElementById('user-role-badge').innerText = "Administrator Panel";
+                document.getElementById('welcome-message').innerText = `Selamat Datang ${currentUser.name}`;
+                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('user-panel').classList.remove('hidden');
+                document.getElementById('user-archive-container').classList.add('hidden');
+                fetchAdminArchive();
+            } else {
+                document.getElementById('user-role-badge').innerText = `User - ${currentUser.name}`;
+                document.getElementById('welcome-message').innerText = `Selamat Datang ${currentUser.name}`;
+                document.getElementById('user-panel').classList.remove('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
+                document.getElementById('user-archive-container').classList.remove('hidden');
+                fetchUserArchive();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUserSession');
+            location.reload();
+        }
+
+        async function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function handleUpload(e) {
+            e.preventDefault();
+            const tanggalPilih = document.getElementById('input-tanggal-laporan').value;
+            const instansi = document.getElementById('input-instansi').value;
+            const kategori = document.getElementById('input-kategori').value;
+            const fileInput = document.getElementById('input-files');
+            const btnUpload = document.getElementById('btn-upload');
+
+            if (!tanggalPilih) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan',
+                    text: 'Silakan pilih tanggal laporan terlebih dahulu!',
+                    confirmButtonColor: '#2563eb'
+                });
+                return;
+            }
+
+            if (fileInput.files.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan',
+                    text: 'Silakan pilih minimal 1 foto!',
+                    confirmButtonColor: '#2563eb'
+                });
+                return;
+            }
+
+            btnUpload.disabled = true;
+            btnUpload.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengunggah...`;
+
+            try {
+                // Konversi tanggal input (misal: "2026-10-07") ke format teks "07 oktober 2026"
+                const dateObj = new Date(tanggalPilih + 'T00:00:00');
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const monthNames = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
+                const month = monthNames[dateObj.getMonth()];
+                const year = dateObj.getFullYear();
+                const formattedDateFolder = `${day} ${month} ${year}`; // Contoh: "07 oktober 2026"
+
+                let uploadedFilesData = [];
+
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    const file = fileInput.files[i];
+                    const base64 = await toBase64(file);
+                    
+                    uploadedFilesData.push({
+                        fileName: `${kategori}_${Date.now()}_${file.name}`,
+                        fileData: base64,
+                        category: kategori,
+                        dateFolder: formattedDateFolder // Format tanggal yang dikirimkan ke Google Drive
+                    });
+                }
+
+                const reportPayload = {
+                    uploader: currentUser.name,
+                    instansi: instansi,
+                    kategori: kategori,
+                    tanggal: dateObj.toISOString(),
+                    files: uploadedFilesData
+                };
+
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reportPayload)
+                });
+
+                await window.addDoc(window.collection(window.db, "laporan_dokumentasi"), {
+                    ...reportPayload,
+                    createdAt: window.serverTimestamp()
+                });
+
+                sendWhatsAppNotification(currentUser.name, instansi, kategori, fileInput.files.length, formattedDateFolder);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Laporan dan foto berhasil diunggah ke Sistem.',
+                    confirmButtonColor: '#2563eb',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                document.getElementById('upload-form').reset();
+                document.getElementById('input-instansi').value = "SPPG KOTA SERANG SERANG SERANG 2";
+                document.getElementById('input-tanggal-laporan').value = new Date().toISOString().split('T')[0];
+
+                if (currentUser.role === 'admin') {
+                    fetchAdminArchive();
+                } else {
+                    fetchUserArchive();
+                }
+
+            } catch (error) {
+                console.error("Gagal upload:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan',
+                    text: 'Terjadi kesalahan saat mengunggah foto.',
+                    confirmButtonColor: '#2563eb'
+                });
+            } finally {
+                btnUpload.disabled = false;
+                btnUpload.innerHTML = `<i class="fa-solid fa-upload mr-1"></i> Upload Laporan`;
+            }
+        }
+
+        function sendWhatsAppNotification(uploader, instansi, kategori, totalFoto, formattedDateFolder) {
+            const message = `*LAPORAN DOKUMENTASI KERJA BARU*\n\n` +
+                            `Uploader: *${uploader}*\n` +
+                            `Instansi: *${instansi}*\n` +
+                            `Kategori: *${kategori}*\n` +
+                            `Tanggal Laporan: *${formattedDateFolder}*\n` +
+                            `Jumlah Foto: *${totalFoto} File*\n` +
+                            `Waktu Input: *${new Date().toLocaleString('id-ID')}*\n\n` +
+                            `Silakan cek dashboard admin untuk melihat rincian arsip foto.`;
+
+            const formdata = new FormData();
+            formdata.append("target", FONNTE_TARGET);
+            formdata.append("message", message);
+            formdata.append("countryCode", "62");
+
+            fetch("https://api.fonnte.com/send", {
+                method: "POST",
+                headers: { "Authorization": FONNTE_TOKEN },
+                body: formdata,
+                redirect: "follow"
+            }).then(response => response.text())
+              .then(result => console.log("WA Notif Terkirim:", result))
+              .catch(error => console.error("Gagal Kirim WA:", error));
+        }
+
+        async function fetchUserArchive(filter = {}) {
+            const archiveList = document.getElementById('user-archive-list');
+            archiveList.innerHTML = `<p class="text-center text-slate-400 py-6 text-sm">Memuat arsip...</p>`;
+
+            try {
+                const querySnapshot = await window.getDocs(window.collection(window.db, "laporan_dokumentasi"));
+                let html = "";
+                let count = 0;
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    if (data.uploader === currentUser.name) {
+                        if (filter.startDate && new Date(data.tanggal) < new Date(filter.startDate)) return;
+                        if (filter.endDate && new Date(data.tanggal) > new Date(filter.endDate + 'T23:59:59')) return;
+
+                        count++;
+                        html += renderArchiveCard(docSnap.id, data);
+                    }
+                });
+
+                document.getElementById('user-count-badge').innerText = `${count} Laporan`;
+                archiveList.innerHTML = html || `<p class="text-center text-slate-400 py-10 text-sm">Belum ada riwayat dokumen diunggah dalam rentang tanggal tersebut.</p>`;
+            } catch (err) {
+                console.error(err);
+                archiveList.innerHTML = `<p class="text-center text-rose-500 py-6 text-sm">Gagal memuat data arsip.</p>`;
+            }
+        }
+
+        function applyUserFilter() {
+            const startDate = document.getElementById('user-filter-start-date').value;
+            const endDate = document.getElementById('user-filter-end-date').value;
+            fetchUserArchive({ startDate, endDate });
+        }
+
+        function resetUserFilter() {
+            document.getElementById('user-filter-start-date').value = '';
+            document.getElementById('user-filter-end-date').value = '';
+            fetchUserArchive();
+        }
+
+        async function fetchAdminArchive(filter = {}) {
+            const tbody = document.getElementById('admin-archive-list');
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center text-slate-400 py-8">Memuat arsip lengkap...</td></tr>`;
+
+            try {
+                const querySnapshot = await window.getDocs(window.collection(window.db, "laporan_dokumentasi"));
+                let rows = "";
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    
+                    if (filter.startDate && new Date(data.tanggal) < new Date(filter.startDate)) return;
+                    if (filter.endDate && new Date(data.tanggal) > new Date(filter.endDate + 'T23:59:59')) return;
+                    if (filter.instansi && !data.instansi.toLowerCase().includes(filter.instansi.toLowerCase())) return;
+
+                    const dateFormatted = new Date(data.tanggal).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+                    let photosHtml = `<div class="flex space-x-1 overflow-x-auto py-1 max-w-xs">`;
+                    if (data.files && data.files.length > 0) {
+                        data.files.forEach(f => {
+                            photosHtml += `<img src="${f.fileData}" onclick="openPhotoModal('${f.fileData}', '${f.fileName}')" class="w-12 h-12 object-cover rounded-lg border hover:scale-105 transition cursor-pointer" title="Klik untuk pratinjau besar">`;
+                        });
+                    }
+                    photosHtml += `</div>`;
+
+                    const safeFileNames = data.files ? encodeURIComponent(JSON.stringify(data.files.map(f => f.fileName))) : encodeURIComponent(JSON.stringify([]));
+
+                    rows += `
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="py-3 px-4 text-xs text-slate-600">${dateFormatted}</td>
+                            <td class="py-3 px-4 font-semibold text-slate-800">
+                                <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs">${data.uploader}</span>
+                            </td>
+                            <td class="py-3 px-4 text-slate-700">${data.instansi}</td>
+                            <td class="py-3 px-4 text-slate-700 font-medium text-xs">${data.kategori}</td>
+                            <td class="py-3 px-4">${photosHtml}</td>
+                            <td class="py-3 px-4 text-center">
+                                <button onclick="deleteReport('${docSnap.id}', '${data.kategori}', '${safeFileNames}')" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Hapus Laporan & Foto">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = rows || `<tr><td colspan="6" class="text-center text-slate-400 py-8">Tidak ada data arsip yang ditemukan.</td></tr>`;
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-rose-500 py-8">Gagal memuat arsip admin.</td></tr>`;
+            }
+        }
+
+        function renderArchiveCard(id, data) {
+            const dateStr = new Date(data.tanggal).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+            let imagesGrid = `<div class="grid grid-cols-4 sm:grid-cols-6 gap-2 mt-3">`;
+            if (data.files) {
+                data.files.forEach(f => {
+                    imagesGrid += `<img src="${f.fileData}" onclick="openPhotoModal('${f.fileData}', '${f.fileName}')" class="w-full h-16 object-cover rounded-lg border hover:opacity-90 transition cursor-pointer" title="Klik untuk pratinjau besar">`;
+                });
+            }
+            imagesGrid += `</div>`;
+
+            const deleteButtonHtml = currentUser.role === 'admin' ? `
+                <button onclick="deleteReport('${id}', '${data.kategori}', '${encodeURIComponent(JSON.stringify(data.files ? data.files.map(f => f.fileName) : []))}')" class="text-rose-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-100/50 transition text-sm">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            ` : '';
+
+            return `
+                <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 relative group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-2 py-0.5 rounded">${data.kategori}</span>
+                            <h4 class="font-bold text-slate-800 text-sm mt-1">Instansi: ${data.instansi}</h4>
+                            <p class="text-xs text-slate-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i> Tanggal Laporan: <b>${dateStr}</b> | Diunggah oleh: <b>${data.uploader}</b></p>
+                        </div>
+                        ${deleteButtonHtml}
+                    </div>
+                    ${imagesGrid}
+                </div>
+            `;
+        }
+
+        function openPhotoModal(imgSrc, fileName = 'dokumentasi.jpg') {
+            document.getElementById('modal-image-element').src = imgSrc;
+            const downloadBtn = document.getElementById('modal-download-btn');
+            downloadBtn.href = imgSrc;
+            downloadBtn.download = fileName;
+            document.getElementById('photo-modal').classList.remove('hidden');
+        }
+
+        function closePhotoModal() {
+            document.getElementById('photo-modal').classList.add('hidden');
+        }
+
+        async function deleteReport(id, kategori, encodedFileNames) {
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Laporan dan file foto di Sistem akan terhapus permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        let fileNames = [];
+                        try {
+                            fileNames = JSON.parse(decodeURIComponent(encodedFileNames));
+                        } catch(e) {
+                            fileNames = [];
+                        }
+
+                        await window.deleteDoc(window.doc(window.db, "laporan_dokumentasi", id));
+
+                        await fetch(APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: "delete",
+                                kategori: kategori,
+                                fileNames: fileNames
+                            })
+                        });
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Terhapus!',
+                            text: 'Laporan berhasil dihapus dari sistem.',
+                            confirmButtonColor: '#2563eb',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+
+                        if (currentUser.role === 'admin') {
+                            fetchAdminArchive();
+                        } else {
+                            fetchUserArchive();
+                        }
+                    } catch (err) {
+                        console.error("Gagal hapus:", err);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Terjadi kesalahan saat menghapus laporan.',
+                            confirmButtonColor: '#2563eb'
+                        });
+                    }
+                }
+            });
+        }
+
+        function applyAdminFilter() {
+            const startDate = document.getElementById('filter-start-date').value;
+            const endDate = document.getElementById('filter-end-date').value;
+            const instansi = document.getElementById('filter-instansi').value;
+            fetchAdminArchive({ startDate, endDate, instansi });
+        }
+
+        function resetAdminFilter() {
+            document.getElementById('filter-start-date').value = '';
+            document.getElementById('filter-end-date').value = '';
+            document.getElementById('filter-instansi').value = '';
+            fetchAdminArchive();
+        }
+    </script>
+</body>
+</html>
