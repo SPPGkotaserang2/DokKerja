@@ -116,7 +116,7 @@
             <!-- TAB CONTAINER UNTUK USER & ADMIN -->
             <div id="user-panel" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Form Upload User / Admin -->
-                <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div id="upload-form-container" class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <h3 class="font-bold text-lg text-slate-900 mb-4 flex items-center">
                         <i class="fa-solid fa-cloud-arrow-up text-blue-600 mr-2"></i> Upload Dokumentasi
                     </h3>
@@ -187,8 +187,41 @@
                             <span id="user-count-badge" class="ml-2 text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium">0 Laporan</span>
                         </h3>
                         
-                        <!-- Filter Rentang Tanggal untuk User -->
+                        <!-- Filter Rentang Tanggal & Jenis Dokumentasi untuk User -->
                         <div class="flex flex-wrap gap-2 items-center">
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Jenis Dokumentasi</label>
+                                <select id="user-filter-kategori" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                                    <option value="">Semua Jenis</option>
+                                    <option value="FOTO SERAH TERIMA SCURITY">FOTO SERAH TERIMA SCURITY</option>
+                                    <option value="FOTO ABSENSI RELAWAN">FOTO ABSENSI RELAWAN</option>
+                                    <option value="FOTO PENERIMAANABAHAN BAKU">FOTO PENERIMAANABAHAN BAKU</option>
+                                    <option value="FOTO BAHAN BAKU">FOTO BAHAN BAKU</option>
+                                    <option value="FOTO LIMBAH RIJEK PERSIAPAN">FOTO LIMBAH RIJEK PERSIAPAN</option>
+                                    <option value="FOTO TIMBANGAN LIMBAH B3">FOTO TIMBANGAN LIMBAH B3</option>
+                                    <option value="RUANGAN / AREA DAPUR">RUANGAN / AREA DAPUR</option>
+                                    <option value="DISTRIBUSI PAGI PENGIRIMAN">DISTRIBUSI PAGI PENGIRIMAN</option>
+                                    <option value="FOTO CLEANING SERVICE">FOTO CLEANING SERVICE</option>
+                                    <option value="SERAH TERIMA PERSIAPAN - PENGOLAHAN">SERAH TERIMA PERSIAPAN - PENGOLAHAN</option>
+                                    <option value="SERAH TERIMA PENGOLAHAN - PEMORSIAN">SERAH TERIMA PENGOLAHAN - PEMORSIAN</option>
+                                    <option value="SERAH TERIMA PEMORSIAN - DISTRIBUSI">SERAH TERIMA PEMORSIAN - DISTRIBUSI</option>
+                                    <option value="SERAH TERIMA DISTRIBUSI - PENCUCI FOODTRAY">SERAH TERIMA DISTRIBUSI - PENCUCI FOODTRAY</option>
+                                    <option value="SERAH TERIMA PENCUCI FOODTRAY - ASLAP">SERAH TERIMA PENCUCI FOODTRAY - ASLAP</option>
+                                    <option value="FOTO CUCI KENDARAAN">FOTO CUCI KENDARAAN</option>
+                                    <option value="FOTO KENDARAAN">FOTO KENDARAAN</option>
+                                    <option value="KERJA TIM PERSIAPAN">KERJA TIM PERSIAPAN</option>
+                                    <option value="KERJA TIM PENGOLAHAN">KERJA TIM PENGOLAHAN</option>
+                                    <option value="KERJA TIM PEMORSIAN">KERJA TIM PEMORSIAN</option>
+                                    <option value="KERJA TIM PENCUCI FOODTRAY">KERJA TIM PENCUCI FOODTRAY</option>
+                                    <option value="FOTO GALON DAN GAS">FOTO GALON DAN GAS</option>
+                                    <option value="FOTO LIMBAH SISA PEMORSIAN">FOTO LIMBAH SISA PEMORSIAN</option>
+                                    <option value="FOTO LIMBAH SISA OMPRENG">FOTO LIMBAH SISA OMPRENG</option>
+                                    <option value="FOTO SAAT PENGAMBILAN TUKANG SAMPAH">FOTO SAAT PENGAMBILAN TUKANG SAMPAH</option>
+                                    <option value="FOTO SAAT SO BAHAN BAKU">FOTO SAAT SO BAHAN BAKU</option>
+                                    <option value="FOTO SAAT MEMBERSIHKAN IPAL">FOTO SAAT MEMBERSIHKAN IPAL</option>
+                                    <option value="FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA">FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA</option>
+                                </select>
+                            </div>
                             <div>
                                 <label class="block text-[10px] font-semibold text-slate-500 uppercase">Dari</label>
                                 <input type="date" id="user-filter-start-date" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
@@ -198,7 +231,7 @@
                                 <input type="date" id="user-filter-end-date" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
                             </div>
                             <div class="flex items-end space-x-1 pt-3">
-                                <button onclick="applyUserFilter()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs font-medium transition">Filter</button>
+                                <button onclick="applyUserFilter()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs font-medium transition">Cari</button>
                                 <button onclick="resetUserFilter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded-lg text-xs font-medium transition">Reset</button>
                             </div>
                         </div>
@@ -232,7 +265,7 @@
                             <input type="text" id="filter-instansi" placeholder="Cari Instansi..." class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
                         </div>
                         <div class="flex items-end space-x-2">
-                            <button onclick="applyAdminFilter()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition">Filter</button>
+                            <button onclick="applyAdminFilter()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition">Cari</button>
                             <button onclick="resetAdminFilter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">Reset</button>
                         </div>
                     </div>
@@ -329,14 +362,35 @@
         const usersDB = {
             "Serang": { pass: "Mandiri02srg", role: "admin", name: "Admin" },
             "Muamar": { pass: "Muamar2", role: "user", name: "Muamar" },
-            "Lili": { pass: "Lili2", role: "user", name: "Lili" }
+            "Lili": { pass: "Lili2", role: "user", name: "Lili" },
+            "KSPPG": { pass: "Serang2", role: "viewer", name: "Mohamad Fahrurozi" }
         };
 
         let currentUser = null;
         let isSyncingActive = false; // Status untuk mencegah upload saat sinkronisasi berjalan
 
-        document.getElementById('current-date-label').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('input-tanggal-laporan').value = new Date().toISOString().split('T')[0];
+        // Fungsi Memastikan Tanggal Live Otomatis Mengikuti Tanggal Sekarang
+        function setTodayDate() {
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const inputTanggal = document.getElementById('input-tanggal-laporan');
+            
+            // Cek jika fokus user sedang tidak mengisi input secara manual
+            if (inputTanggal && document.activeElement !== inputTanggal) {
+                if (inputTanggal.value !== today) {
+                    inputTanggal.value = today;
+                }
+            }
+
+            const dateLabel = document.getElementById('current-date-label');
+            if (dateLabel) {
+                dateLabel.innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            }
+        }
+
+        // Jalankan pembaruan tanggal otomatis secara live setiap detik
+        setInterval(setTodayDate, 1000);
+        setTodayDate();
         checkNetworkSpeed();
 
         function checkNetworkSpeed() {
@@ -421,19 +475,47 @@
             document.getElementById('dashboard-section').classList.remove('hidden');
             document.getElementById('display-username').innerText = currentUser.name;
 
+            // Set Tanggal Hari Ini saat masuk Dashboard
+            setTodayDate();
+
             if (currentUser.role === 'admin') {
                 document.getElementById('user-role-badge').innerText = "Administrator Panel";
                 document.getElementById('welcome-message').innerText = `Selamat Datang ${currentUser.name}`;
                 document.getElementById('admin-panel').classList.remove('hidden');
                 document.getElementById('user-panel').classList.remove('hidden');
+                document.getElementById('upload-form-container').classList.remove('hidden');
                 document.getElementById('user-archive-container').classList.add('hidden');
                 fetchAdminArchive();
+            } else if (currentUser.role === 'viewer') {
+                // Konfigurasi Khusus untuk Akun Mohamad Fahrurozi (Viewer Only)
+                document.getElementById('user-role-badge').innerText = `Viewer - ${currentUser.name}`;
+                document.getElementById('welcome-message').innerText = `Selamat Datang ${currentUser.name}`;
+                document.getElementById('user-panel').classList.remove('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
+                
+                // Sembunyikan Form Upload & Buat Tampilan Arsip Penuh
+                document.getElementById('upload-form-container').classList.add('hidden');
+                const userArchiveContainer = document.getElementById('user-archive-container');
+                userArchiveContainer.classList.remove('hidden');
+                userArchiveContainer.classList.remove('lg:col-span-2');
+                userArchiveContainer.classList.add('lg:col-span-3');
+
+                fetchUserArchive();
             } else {
                 document.getElementById('user-role-badge').innerText = `User - ${currentUser.name}`;
                 document.getElementById('welcome-message').innerText = `Selamat Datang ${currentUser.name}`;
                 document.getElementById('user-panel').classList.remove('hidden');
                 document.getElementById('admin-panel').classList.add('hidden');
-                document.getElementById('user-archive-container').classList.remove('hidden');
+                
+                // Tampilkan Form Upload untuk User Biasa
+                const uploadFormContainer = document.getElementById('upload-form-container');
+                uploadFormContainer.classList.remove('hidden');
+                
+                const userArchiveContainer = document.getElementById('user-archive-container');
+                userArchiveContainer.classList.remove('hidden');
+                userArchiveContainer.classList.remove('lg:col-span-3');
+                userArchiveContainer.classList.add('lg:col-span-2');
+
                 fetchUserArchive();
             }
         }
@@ -597,10 +679,10 @@
                     createdDocIds.push({ id: docRef.id, payload: reportPayload });
                 }
 
-                // Reset Form
+                // Reset Form & Otomatis kembalikan tanggal ke tanggal sekarang
                 document.getElementById('upload-form').reset();
                 document.getElementById('input-instansi').value = "SPPG KOTA SERANG SERANG SERANG 2";
-                document.getElementById('input-tanggal-laporan').value = new Date().toISOString().split('T')[0];
+                setTodayDate();
 
                 // Perbarui tampilan antarmuka secara instan
                 if (currentUser.role === 'admin') {
@@ -845,9 +927,11 @@
 
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    if (data.uploader === currentUser.name) {
+                    // Mohamad Fahrurozi (Viewer) dapat melihat seluruh foto dari semua uploader
+                    if (currentUser.role === 'viewer' || data.uploader === currentUser.name) {
                         if (filter.startDate && new Date(data.tanggal) < new Date(filter.startDate)) return;
                         if (filter.endDate && new Date(data.tanggal) > new Date(filter.endDate + 'T23:59:59')) return;
+                        if (filter.kategori && data.kategori !== filter.kategori) return;
 
                         rawList.push({ id: docSnap.id, ...data });
                     }
@@ -855,8 +939,10 @@
 
                 const groupedData = groupReports(rawList);
                 
-                // Evaluasi status sinkronisasi aktif untuk kunci/buka tombol upload
-                checkGlobalSyncStatus(groupedData);
+                // Evaluasi status sinkronisasi aktif untuk kunci/buka tombol upload (jika user)
+                if (currentUser.role === 'user') {
+                    checkGlobalSyncStatus(groupedData);
+                }
 
                 let html = "";
 
@@ -865,7 +951,7 @@
                 });
 
                 document.getElementById('user-count-badge').innerText = `${groupedData.length} Laporan`;
-                archiveList.innerHTML = html || `<p class="text-center text-slate-400 py-10 text-sm">Belum ada riwayat dokumen diunggah dalam rentang tanggal tersebut.</p>`;
+                archiveList.innerHTML = html || `<p class="text-center text-slate-400 py-10 text-sm">Belum ada riwayat dokumen diunggah dalam rentang tanggal / kategori tersebut.</p>`;
             } catch (err) {
                 console.error(err);
                 archiveList.innerHTML = `<p class="text-center text-rose-500 py-6 text-sm">Gagal memuat data arsip.</p>`;
@@ -875,12 +961,14 @@
         function applyUserFilter() {
             const startDate = document.getElementById('user-filter-start-date').value;
             const endDate = document.getElementById('user-filter-end-date').value;
-            fetchUserArchive({ startDate, endDate });
+            const kategori = document.getElementById('user-filter-kategori').value;
+            fetchUserArchive({ startDate, endDate, kategori });
         }
 
         function resetUserFilter() {
             document.getElementById('user-filter-start-date').value = '';
             document.getElementById('user-filter-end-date').value = '';
+            document.getElementById('user-filter-kategori').value = '';
             fetchUserArchive();
         }
 
@@ -1003,9 +1091,11 @@
                     <span class="inline-flex items-center text-[11px] bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-md font-bold">
                         <i class="fa-solid fa-circle-xmark text-rose-500 mr-1"></i> Gagal (Wajib Upload Ulang)
                     </span>
+                    ${currentUser.role !== 'viewer' ? `
                     <button onclick="retrySyncGroup('${safeDocIds}')" class="text-[10px] bg-rose-600 hover:bg-rose-700 text-white px-2 py-0.5 rounded shadow transition">
                         <i class="fa-solid fa-rotate-right mr-1"></i> Upload Ulang
                     </button>
+                    ` : ''}
                 </div>`;
             } else {
                 syncStatusHtml = `<span class="inline-flex items-center text-[11px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-md font-semibold">
@@ -1132,4 +1222,3 @@
     </script>
 </body>
 </html>
-
