@@ -368,15 +368,20 @@
 
         let currentUser = null;
         let isSyncingActive = false; // Status untuk mencegah upload saat sinkronisasi berjalan
+        let isDateManuallyModified = false; // Penanda jika user secara manual memilih/mengubah tanggal
 
-        // Fungsi Memastikan Tanggal Live Otomatis Mengikuti Tanggal Sekarang
+        // Fungsi Memastikan Tanggal Live Otomatis Mengikuti Tanggal Sekarang (Dapat Dipilih Manual)
         function setTodayDate() {
             const now = new Date();
-            const today = now.toISOString().split('T')[0];
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const today = `${year}-${month}-${day}`;
+
             const inputTanggal = document.getElementById('input-tanggal-laporan');
             
-            // Cek jika fokus user sedang tidak mengisi input secara manual
-            if (inputTanggal && document.activeElement !== inputTanggal) {
+            // Hanya update otomatis jika user BELUM memilih/mengubah tanggal secara manual
+            if (inputTanggal && !isDateManuallyModified) {
                 if (inputTanggal.value !== today) {
                     inputTanggal.value = today;
                 }
@@ -387,6 +392,16 @@
                 dateLabel.innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             }
         }
+
+        // Listener untuk mendeteksi perubahan tanggal manual oleh user
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputTanggal = document.getElementById('input-tanggal-laporan');
+            if (inputTanggal) {
+                inputTanggal.addEventListener('change', () => {
+                    isDateManuallyModified = true; // Tandai bahwa user mengubah tanggal secara manual
+                });
+            }
+        });
 
         // Jalankan pembaruan tanggal otomatis secara live setiap detik
         setInterval(setTodayDate, 1000);
@@ -679,9 +694,10 @@
                     createdDocIds.push({ id: docRef.id, payload: reportPayload });
                 }
 
-                // Reset Form & Otomatis kembalikan tanggal ke tanggal sekarang
+                // Reset Form & Otomatis kembalikan penanda tanggal manual
                 document.getElementById('upload-form').reset();
                 document.getElementById('input-instansi').value = "SPPG KOTA SERANG SERANG SERANG 2";
+                isDateManuallyModified = false;
                 setTodayDate();
 
                 // Perbarui tampilan antarmuka secara instan
@@ -881,10 +897,11 @@
                 const isFailed = item.syncFailed === true;
                 const statusTag = isSynced ? 'synced' : (isFailed ? 'failed' : 'pending');
 
-                // DIBEDAKAN: batchGroupId / Waktu Upload dipisahkan agar upload beda waktu (pagi vs siang) tidak bergabung sebelum berhasil sinkron
-                const batchKey = item.batchGroupId || item.syncStartTime || (item.createdAt ? new Date(item.createdAt).getTime() : 'single');
+                // DIBEDAKAN: Jika sudah berhasil disinkronkan ('synced'), gabungkan semua upload dalam tanggal, uploader, instansi & jenis yang sama.
+                // Jika belum/gagal ('pending'/'failed'), pisahkan berdasarkan batch agar tidak memicu error tombol kuncian.
+                const batchKey = isSynced ? 'synced_combined' : (item.batchGroupId || item.syncStartTime || (item.createdAt ? new Date(item.createdAt).getTime() : 'single'));
 
-                // Kunci grup unik: Jika belum sinkron, tidak akan bergabung dengan data yang sudah sinkron
+                // Kunci grup unik: Memungkinkan foto jenis sama di tanggal yang sama bergabung setelah sinkronisasi berhasil
                 const key = `${dateKey}_${item.uploader}_${item.instansi}_${item.kategori}_${statusTag}_${batchKey}`;
 
                 if (!grouped[key]) {
