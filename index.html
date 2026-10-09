@@ -123,7 +123,7 @@
                     <form id="upload-form" onsubmit="handleUpload(event)" class="space-y-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Tanggal Laporan</label>
-                            <input type="date" id="input-tanggal-laporan" required 
+                            <input type="date" id="input-tanggal-laporan" required onchange="updateCategoryDropdownOptions()"
                                 class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none">
                         </div>
 
@@ -137,38 +137,11 @@
                             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Jenis Foto Dokumentasi</label>
                             <select id="input-kategori" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none">
                                 <option value="">-- Pilih Jenis Dokumentasi --</option>
-                                <option value="FOTO SERAH TERIMA SCURITY">FOTO SERAH TERIMA SCURITY</option>
-                                <option value="FOTO ABSENSI RELAWAN">FOTO ABSENSI RELAWAN</option>
-                                <option value="FOTO PENERIMAANABAHAN BAKU">FOTO PENERIMAANABAHAN BAKU</option>
-                                <option value="FOTO BAHAN BAKU">FOTO BAHAN BAKU</option>
-                                <option value="FOTO LIMBAH RIJEK PERSIAPAN">FOTO LIMBAH RIJEK PERSIAPAN</option>
-                                <option value="FOTO TIMBANGAN LIMBAH B3">FOTO TIMBANGAN LIMBAH B3</option>
-                                <option value="RUANGAN / AREA DAPUR">RUANGAN / AREA DAPUR</option>
-                                <option value="DISTRIBUSI PAGI PENGIRIMAN">DISTRIBUSI PAGI PENGIRIMAN</option>
-                                <option value="FOTO CLEANING SERVICE">FOTO CLEANING SERVICE</option>
-                                <option value="SERAH TERIMA PERSIAPAN - PENGOLAHAN">SERAH TERIMA PERSIAPAN - PENGOLAHAN</option>
-                                <option value="SERAH TERIMA PENGOLAHAN - PEMORSIAN">SERAH TERIMA PENGOLAHAN - PEMORSIAN</option>
-                                <option value="SERAH TERIMA PEMORSIAN - DISTRIBUSI">SERAH TERIMA PEMORSIAN - DISTRIBUSI</option>
-                                <option value="SERAH TERIMA DISTRIBUSI - PENCUCI FOODTRAY">SERAH TERIMA DISTRIBUSI - PENCUCI FOODTRAY</option>
-                                <option value="SERAH TERIMA PENCUCI FOODTRAY - ASLAP">SERAH TERIMA PENCUCI FOODTRAY - ASLAP</option>
-                                <option value="FOTO CUCI KENDARAAN">FOTO CUCI KENDARAAN</option>
-                                <option value="FOTO KENDARAAN">FOTO KENDARAAN</option>
-                                <option value="KERJA TIM PERSIAPAN">KERJA TIM PERSIAPAN</option>
-                                <option value="KERJA TIM PENGOLAHAN">KERJA TIM PENGOLAHAN</option>
-                                <option value="KERJA TIM PEMORSIAN">KERJA TIM PEMORSIAN</option>
-                                <option value="KERJA TIM PENCUCI FOODTRAY">KERJA TIM PENCUCI FOODTRAY</option>
-                                <option value="FOTO GALON DAN GAS">FOTO GALON DAN GAS</option>
-                                <option value="FOTO LIMBAH SISA PEMORSIAN">FOTO LIMBAH SISA PEMORSIAN</option>
-                                <option value="FOTO LIMBAH SISA OMPRENG">FOTO LIMBAH SISA OMPRENG</option>
-                                <option value="FOTO SAAT PENGAMBILAN TUKANG SAMPAH">FOTO SAAT PENGAMBILAN TUKANG SAMPAH</option>
-                                <option value="FOTO SAAT SO BAHAN BAKU">FOTO SAAT SO BAHAN BAKU</option>
-                                <option value="FOTO SAAT MEMBERSIHKAN IPAL">FOTO SAAT MEMBERSIHKAN IPAL</option>
-                                <option value="FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA">FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA</option>
                             </select>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Foto (Tanpa Batasan Foto)</label>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Foto (Minimal 2 Foto, Maksimal Tak Terbatas)</label>
                             <input type="file" id="input-files" multiple accept="image/*" required 
                                 class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
                         </div>
@@ -179,16 +152,20 @@
                     </form>
                 </div>
 
-                <!-- Riwayat Arsip User -->
+                <!-- Riwayat Arsip User (Tampil List Nama Jenis Dokumentasi & Semua Uploader) -->
                 <div id="user-archive-container" class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
                         <h3 class="font-bold text-lg text-slate-900 flex items-center">
-                            <span><i class="fa-solid fa-box-archive text-blue-600 mr-2"></i> Riwayat Arsip Anda</span>
+                            <span><i class="fa-solid fa-box-archive text-blue-600 mr-2"></i> Riwayat Laporan</span>
                             <span id="user-count-badge" class="ml-2 text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium">0 Laporan</span>
                         </h3>
                         
-                        <!-- Filter Rentang Tanggal & Jenis Dokumentasi untuk User -->
+                        <!-- Filter Tanggal Tunggal & Jenis Dokumentasi untuk User -->
                         <div class="flex flex-wrap gap-2 items-center">
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tanggal Laporan</label>
+                                <input type="date" id="user-filter-date" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                            </div>
                             <div>
                                 <label class="block text-[10px] font-semibold text-slate-500 uppercase">Jenis Dokumentasi</label>
                                 <select id="user-filter-kategori" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
@@ -222,14 +199,6 @@
                                     <option value="FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA">FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA</option>
                                 </select>
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Dari</label>
-                                <input type="date" id="user-filter-start-date" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Sampai</label>
-                                <input type="date" id="user-filter-end-date" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                            </div>
                             <div class="flex items-end space-x-1 pt-3">
                                 <button onclick="applyUserFilter()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs font-medium transition">Cari</button>
                                 <button onclick="resetUserFilter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded-lg text-xs font-medium transition">Reset</button>
@@ -237,8 +206,8 @@
                         </div>
                     </div>
 
-                    <div id="user-archive-list" class="space-y-4 max-h-[450px] overflow-y-auto pr-2">
-                        <p class="text-center text-slate-400 py-10 text-sm">Belum ada riwayat dokumen diunggah.</p>
+                    <div id="user-archive-list" class="space-y-3 max-h-[450px] overflow-y-auto pr-2">
+                        <p class="text-center text-slate-400 py-10 text-sm">Memuat riwayat...</p>
                     </div>
                 </div>
             </div>
@@ -250,19 +219,44 @@
                         <i class="fa-solid fa-shield-halved text-blue-600 mr-2"></i> Panel Kontrol & Arsip Full Admin
                     </h3>
                     
-                    <!-- Filter Rentang Tanggal & Instansi -->
+                    <!-- Filter Tanggal Tunggal & Jenis Dokumentasi (Dropdown) -->
                     <div class="flex flex-wrap gap-3 items-center">
                         <div>
-                            <label class="block text-[10px] font-semibold text-slate-500 uppercase">Dari Tanggal</label>
-                            <input type="date" id="filter-start-date" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tanggal Laporan</label>
+                            <input type="date" id="filter-date" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-semibold text-slate-500 uppercase">Sampai Tanggal</label>
-                            <input type="date" id="filter-end-date" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-semibold text-slate-500 uppercase">Instansi</label>
-                            <input type="text" id="filter-instansi" placeholder="Cari Instansi..." class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase">Jenis Dokumentasi</label>
+                            <select id="filter-kategori" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                                <option value="">Semua Jenis Dokumentasi</option>
+                                <option value="FOTO SERAH TERIMA SCURITY">FOTO SERAH TERIMA SCURITY</option>
+                                <option value="FOTO ABSENSI RELAWAN">FOTO ABSENSI RELAWAN</option>
+                                <option value="FOTO PENERIMAANABAHAN BAKU">FOTO PENERIMAANABAHAN BAKU</option>
+                                <option value="FOTO BAHAN BAKU">FOTO BAHAN BAKU</option>
+                                <option value="FOTO LIMBAH RIJEK PERSIAPAN">FOTO LIMBAH RIJEK PERSIAPAN</option>
+                                <option value="FOTO TIMBANGAN LIMBAH B3">FOTO TIMBANGAN LIMBAH B3</option>
+                                <option value="RUANGAN / AREA DAPUR">RUANGAN / AREA DAPUR</option>
+                                <option value="DISTRIBUSI PAGI PENGIRIMAN">DISTRIBUSI PAGI PENGIRIMAN</option>
+                                <option value="FOTO CLEANING SERVICE">FOTO CLEANING SERVICE</option>
+                                <option value="SERAH TERIMA PERSIAPAN - PENGOLAHAN">SERAH TERIMA PERSIAPAN - PENGOLAHAN</option>
+                                <option value="SERAH TERIMA PENGOLAHAN - PEMORSIAN">SERAH TERIMA PENGOLAHAN - PEMORSIAN</option>
+                                <option value="SERAH TERIMA PEMORSIAN - DISTRIBUSI">SERAH TERIMA PEMORSIAN - DISTRIBUSI</option>
+                                <option value="SERAH TERIMA DISTRIBUSI - PENCUCI FOODTRAY">SERAH TERIMA DISTRIBUSI - PENCUCI FOODTRAY</option>
+                                <option value="SERAH TERIMA PENCUCI FOODTRAY - ASLAP">SERAH TERIMA PENCUCI FOODTRAY - ASLAP</option>
+                                <option value="FOTO CUCI KENDARAAN">FOTO CUCI KENDARAAN</option>
+                                <option value="FOTO KENDARAAN">FOTO KENDARAAN</option>
+                                <option value="KERJA TIM PERSIAPAN">KERJA TIM PERSIAPAN</option>
+                                <option value="KERJA TIM PENGOLAHAN">KERJA TIM PENGOLAHAN</option>
+                                <option value="KERJA TIM PEMORSIAN">KERJA TIM PEMORSIAN</option>
+                                <option value="KERJA TIM PENCUCI FOODTRAY">KERJA TIM PENCUCI FOODTRAY</option>
+                                <option value="FOTO GALON DAN GAS">FOTO GALON DAN GAS</option>
+                                <option value="FOTO LIMBAH SISA PEMORSIAN">FOTO LIMBAH SISA PEMORSIAN</option>
+                                <option value="FOTO LIMBAH SISA OMPRENG">FOTO LIMBAH SISA OMPRENG</option>
+                                <option value="FOTO SAAT PENGAMBILAN TUKANG SAMPAH">FOTO SAAT PENGAMBILAN TUKANG SAMPAH</option>
+                                <option value="FOTO SAAT SO BAHAN BAKU">FOTO SAAT SO BAHAN BAKU</option>
+                                <option value="FOTO SAAT MEMBERSIHKAN IPAL">FOTO SAAT MEMBERSIHKAN IPAL</option>
+                                <option value="FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA">FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA</option>
+                            </select>
                         </div>
                         <div class="flex items-end space-x-2">
                             <button onclick="applyAdminFilter()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition">Cari</button>
@@ -325,7 +319,7 @@
     <!-- FIREBASE SDK & SKRIP UTAMA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAvQjzU7gv4mQm1bV34Yh9taZLaEvX69Es",
@@ -350,6 +344,7 @@
         window.query = query;
         window.orderBy = orderBy;
         window.serverTimestamp = serverTimestamp;
+        window.onSnapshot = onSnapshot;
         
         initializeAppState();
     </script>
@@ -367,10 +362,72 @@
         };
 
         let currentUser = null;
-        let isSyncingActive = false; // Status untuk mencegah upload saat sinkronisasi berjalan
-        let isDateManuallyModified = false; // Penanda jika user secara manual memilih/mengubah tanggal
+        let isSyncingActive = false; 
+        let isDateManuallyModified = false; 
+        let allGlobalReports = []; 
 
-        // Fungsi Memastikan Tanggal Live Otomatis Mengikuti Tanggal Sekarang (Dapat Dipilih Manual)
+        const ALL_CATEGORIES = [
+            "FOTO SERAH TERIMA SCURITY",
+            "FOTO ABSENSI RELAWAN",
+            "FOTO PENERIMAANABAHAN BAKU",
+            "FOTO BAHAN BAKU",
+            "FOTO LIMBAH RIJEK PERSIAPAN",
+            "FOTO TIMBANGAN LIMBAH B3",
+            "RUANGAN / AREA DAPUR",
+            "DISTRIBUSI PAGI PENGIRIMAN",
+            "FOTO CLEANING SERVICE",
+            "SERAH TERIMA PERSIAPAN - PENGOLAHAN",
+            "SERAH TERIMA PENGOLAHAN - PEMORSIAN",
+            "SERAH TERIMA PEMORSIAN - DISTRIBUSI",
+            "SERAH TERIMA DISTRIBUSI - PENCUCI FOODTRAY",
+            "SERAH TERIMA PENCUCI FOODTRAY - ASLAP",
+            "FOTO CUCI KENDARAAN",
+            "FOTO KENDARAAN",
+            "KERJA TIM PERSIAPAN",
+            "KERJA TIM PENGOLAHAN",
+            "KERJA TIM PEMORSIAN",
+            "KERJA TIM PENCUCI FOODTRAY",
+            "FOTO GALON DAN GAS",
+            "FOTO LIMBAH SISA PEMORSIAN",
+            "FOTO LIMBAH SISA OMPRENG",
+            "FOTO SAAT PENGAMBILAN TUKANG SAMPAH",
+            "FOTO SAAT SO BAHAN BAKU",
+            "FOTO SAAT MEMBERSIHKAN IPAL",
+            "FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA"
+        ];
+
+        function updateCategoryDropdownOptions() {
+            const selectEl = document.getElementById('input-kategori');
+            const selectedDateInput = document.getElementById('input-tanggal-laporan');
+            if (!selectEl || !selectedDateInput) return;
+
+            const chosenDate = selectedDateInput.value;
+            const currentSelectedVal = selectEl.value;
+
+            const uploadedCategoriesToday = new Set();
+            allGlobalReports.forEach(rep => {
+                const repDate = rep.tanggal ? (rep.tanggal.includes('T') ? rep.tanggal.split('T')[0] : rep.tanggal) : '';
+                if (repDate === chosenDate) {
+                    uploadedCategoriesToday.add(rep.kategori);
+                }
+            });
+
+            let optionsHtml = `<option value="">-- Pilih Jenis Dokumentasi --</option>`;
+            ALL_CATEGORIES.forEach(cat => {
+                if (!uploadedCategoriesToday.has(cat)) {
+                    optionsHtml += `<option value="${cat}">${cat}</option>`;
+                }
+            });
+
+            selectEl.innerHTML = optionsHtml;
+            
+            if (currentSelectedVal && !uploadedCategoriesToday.has(currentSelectedVal)) {
+                selectEl.value = currentSelectedVal;
+            } else {
+                selectEl.value = "";
+            }
+        }
+
         function setTodayDate() {
             const now = new Date();
             const year = now.getFullYear();
@@ -380,10 +437,10 @@
 
             const inputTanggal = document.getElementById('input-tanggal-laporan');
             
-            // Hanya update otomatis jika user BELUM memilih/mengubah tanggal secara manual
             if (inputTanggal && !isDateManuallyModified) {
                 if (inputTanggal.value !== today) {
                     inputTanggal.value = today;
+                    updateCategoryDropdownOptions();
                 }
             }
 
@@ -393,17 +450,16 @@
             }
         }
 
-        // Listener untuk mendeteksi perubahan tanggal manual oleh user
         document.addEventListener('DOMContentLoaded', () => {
             const inputTanggal = document.getElementById('input-tanggal-laporan');
             if (inputTanggal) {
                 inputTanggal.addEventListener('change', () => {
-                    isDateManuallyModified = true; // Tandai bahwa user mengubah tanggal secara manual
+                    isDateManuallyModified = true;
+                    updateCategoryDropdownOptions();
                 });
             }
         });
 
-        // Jalankan pembaruan tanggal otomatis secara live setiap detik
         setInterval(setTodayDate, 1000);
         setTodayDate();
         checkNetworkSpeed();
@@ -490,8 +546,10 @@
             document.getElementById('dashboard-section').classList.remove('hidden');
             document.getElementById('display-username').innerText = currentUser.name;
 
-            // Set Tanggal Hari Ini saat masuk Dashboard
             setTodayDate();
+
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
             if (currentUser.role === 'admin') {
                 document.getElementById('user-role-badge').innerText = "Administrator Panel";
@@ -500,29 +558,29 @@
                 document.getElementById('user-panel').classList.remove('hidden');
                 document.getElementById('upload-form-container').classList.remove('hidden');
                 document.getElementById('user-archive-container').classList.add('hidden');
-                fetchAdminArchive();
+                
+                document.getElementById('filter-date').value = todayStr;
+                initRealtimeListener();
             } else if (currentUser.role === 'viewer') {
-                // Konfigurasi Khusus untuk Akun Mohamad Fahrurozi (Viewer Only)
                 document.getElementById('user-role-badge').innerText = `Viewer - ${currentUser.name}`;
                 document.getElementById('welcome-message').innerText = `Selamat Datang ${currentUser.name}`;
                 document.getElementById('user-panel').classList.remove('hidden');
                 document.getElementById('admin-panel').classList.add('hidden');
                 
-                // Sembunyikan Form Upload & Buat Tampilan Arsip Penuh
                 document.getElementById('upload-form-container').classList.add('hidden');
                 const userArchiveContainer = document.getElementById('user-archive-container');
                 userArchiveContainer.classList.remove('hidden');
                 userArchiveContainer.classList.remove('lg:col-span-2');
                 userArchiveContainer.classList.add('lg:col-span-3');
 
-                fetchUserArchive();
+                document.getElementById('user-filter-date').value = todayStr;
+                initRealtimeListener();
             } else {
                 document.getElementById('user-role-badge').innerText = `User - ${currentUser.name}`;
                 document.getElementById('welcome-message').innerText = `Selamat Datang ${currentUser.name}`;
                 document.getElementById('user-panel').classList.remove('hidden');
                 document.getElementById('admin-panel').classList.add('hidden');
                 
-                // Tampilkan Form Upload untuk User Biasa
                 const uploadFormContainer = document.getElementById('upload-form-container');
                 uploadFormContainer.classList.remove('hidden');
                 
@@ -531,7 +589,8 @@
                 userArchiveContainer.classList.remove('lg:col-span-3');
                 userArchiveContainer.classList.add('lg:col-span-2');
 
-                fetchUserArchive();
+                document.getElementById('user-filter-date').value = todayStr;
+                initRealtimeListener();
             }
         }
 
@@ -540,7 +599,28 @@
             location.reload();
         }
 
-        // KOMPRESI TINGGI: Menyesuaikan resolusi maks ke 800px & kualitas 0.55 (30-60 KB per foto)
+        function initRealtimeListener() {
+            window.onSnapshot(window.collection(window.db, "laporan_dokumentasi"), (snapshot) => {
+                let list = [];
+                snapshot.forEach(docSnap => {
+                    list.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                allGlobalReports = list;
+
+                updateCategoryDropdownOptions();
+
+                if (currentUser && currentUser.role === 'admin') {
+                    const dateFilter = document.getElementById('filter-date').value;
+                    const kategoriFilter = document.getElementById('filter-kategori').value;
+                    renderAdminArchiveView({ date: dateFilter, kategori: kategoriFilter });
+                } else if (currentUser) {
+                    const dateFilter = document.getElementById('user-filter-date').value;
+                    const kategori = document.getElementById('user-filter-kategori').value;
+                    renderUserArchiveView({ date: dateFilter, kategori: kategori });
+                }
+            });
+        }
+
         async function compressImageAndGetBase64(file, maxWidth = 800, quality = 0.55) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -573,7 +653,6 @@
             });
         }
 
-        // FUNGSI CEK STATUS SINKRONISASI AKTIF UNTUK MENGUNCI/MEMBUKA TOMBOL UPLOAD
         function checkGlobalSyncStatus(groupedData) {
             const btnUpload = document.getElementById('btn-upload');
             if (!btnUpload) return;
@@ -582,10 +661,8 @@
             let hasUnsynced = false;
 
             for (const item of groupedData) {
-                // Laporan dianggap pending sinkronisasi jika syncedToDrive bukan true dan syncFailed bukan true
                 if (item.syncedToDrive !== true && item.syncFailed !== true) {
                     const startTime = item.syncStartTime || (item.createdAt ? new Date(item.createdAt).getTime() : now);
-                    // Disesuaikan dengan batas 35-40 detik (35000 ms)
                     if (now - startTime < 35000) {
                         hasUnsynced = true;
                         break;
@@ -609,12 +686,11 @@
         async function handleUpload(e) {
             e.preventDefault();
 
-            // SINKRONISASI SYARAT 1: Cegah Pengguna Upload Jika Ada Data yang Belum Berhasil Sinkronisasi
             if (isSyncingActive) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Proses sedang Berjalan',
-                    text: 'Mohon tunggu! Ada data laporan sebelumnya yang belum selesai dikiirm ke sistem.',
+                    text: 'Mohon tunggu! Ada data laporan sebelumnya yang belum selesai dikirim ke sistem.',
                     confirmButtonColor: '#2563eb'
                 });
                 return;
@@ -626,13 +702,13 @@
             const fileInput = document.getElementById('input-files');
             const btnUpload = document.getElementById('btn-upload');
 
-            if (!tanggalPilih) {
-                Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Silakan pilih tanggal laporan terlebih dahulu!', confirmButtonColor: '#2563eb' });
+            if (!tanggalPilih || !kategori) {
+                Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Silakan lengkapi tanggal dan pilih jenis dokumentasi!', confirmButtonColor: '#2563eb' });
                 return;
             }
 
-            if (fileInput.files.length === 0) {
-                Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Silakan pilih minimal 1 foto!', confirmButtonColor: '#2563eb' });
+            if (fileInput.files.length < 2) {
+                Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Pilih minimal 2 foto untuk melanjutkan!', confirmButtonColor: '#2563eb' });
                 return;
             }
 
@@ -661,7 +737,6 @@
                     });
                 }
 
-                // CHUNKING: Bagi menjadi batch berisi maksimal 10 foto per dokumen Firestore
                 const CHUNK_SIZE = 10;
                 const batchGroups = [];
                 for (let i = 0; i < allCompressedFiles.length; i += CHUNK_SIZE) {
@@ -669,7 +744,7 @@
                 }
 
                 const uploadBatchGroupId = Date.now().toString();
-                const syncStartTime = Date.now(); // Penanda waktu awal proses sinkronisasi
+                const syncStartTime = Date.now();
                 let createdDocIds = [];
 
                 for (let i = 0; i < batchGroups.length; i++) {
@@ -677,7 +752,7 @@
                         uploader: currentUser.name,
                         instansi: instansi,
                         kategori: kategori,
-                        tanggal: dateObj.toISOString(),
+                        tanggal: tanggalPilih,
                         files: batchGroups[i],
                         syncedToDrive: false,
                         syncFailed: false,
@@ -694,31 +769,22 @@
                     createdDocIds.push({ id: docRef.id, payload: reportPayload });
                 }
 
-                // Reset Form & Otomatis kembalikan penanda tanggal manual
                 document.getElementById('upload-form').reset();
                 document.getElementById('input-instansi').value = "SPPG KOTA SERANG SERANG SERANG 2";
                 isDateManuallyModified = false;
                 setTodayDate();
 
-                // Perbarui tampilan antarmuka secara instan
-                if (currentUser.role === 'admin') {
-                    fetchAdminArchive();
-                } else {
-                    fetchUserArchive();
-                }
-
-                // Notifikasi sukses langsung
                 Swal.fire({
                     html: `
                         <div class="py-4">
                             <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner animate-bounce">
                                 <i class="fa-solid fa-cloud-arrow-up"></i>
                             </div>
-                            <h2 class="text-2xl font-bold text-slate-800 mb-2">Berhasil!</h2>
-                            <p class="text-sm text-slate-600">Total <b>${allCompressedFiles.length} foto</b> tersimpan ke <b>Arsip Sistem</b>.</p>
+                            <h2 class="text-2xl font-bold text-slate-800 mb-2">BERHASIL!</h2>
+                            <p class="text-sm text-slate-600">Silahkan Klik OK untuk melanjutkan</p>
                             <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-left text-xs text-blue-800 flex items-center gap-3">
                                 <i class="fa-solid fa-sync fa-spin text-lg text-blue-600"></i>
-                                <span>Tunggu Sebentar...</span>
+                                <span>Sedang Dikirim</span>
                             </div>
                         </div>
                     `,
@@ -728,12 +794,10 @@
                     customClass: { popup: 'rounded-3xl shadow-2xl border border-slate-100' }
                 });
 
-                // Sinkronisasi latar belakang
                 createdDocIds.forEach(item => {
                     syncToDriveInBackground(item.id, item.payload, formattedDateFolder, item.payload.files.length);
                 });
 
-                // Kirim notifikasi WhatsApp
                 sendWhatsAppNotification(currentUser.name, instansi, kategori, allCompressedFiles.length, formattedDateFolder);
 
             } catch (error) {
@@ -750,10 +814,9 @@
             }
         }
 
-        // SINKRONISASI SYARAT 2: Penanganan Timeout 35 Detik (30-40 Detik) & Retry Manual
         async function syncToDriveInBackground(docId, reportPayload, formattedDateFolder, totalFoto) {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 35000); // Batas Waktu Tepat 35 Detik (35.000 ms)
+            const timeoutId = setTimeout(() => controller.abort(), 35000);
 
             try {
                 fetch(APPS_SCRIPT_URL, {
@@ -769,53 +832,30 @@
                         syncedToDrive: true,
                         syncFailed: false 
                     });
-
-                    if (currentUser && currentUser.role === 'admin') {
-                        fetchAdminArchive();
-                    } else if (currentUser) {
-                        fetchUserArchive();
-                    }
                 }).catch(async (err) => {
                     clearTimeout(timeoutId);
-                    console.error("gagal di proses:", err);
-                    
-                    // Set Status Ke Gagal Di Firestore
                     const targetRef = window.doc(window.db, "laporan_dokumentasi", docId);
                     await window.updateDoc(targetRef, { 
                         syncedToDrive: false,
                         syncFailed: true 
                     });
-
-                    if (currentUser && currentUser.role === 'admin') {
-                        fetchAdminArchive();
-                    } else if (currentUser) {
-                        fetchUserArchive();
-                    }
                 });
             } catch (syncErr) {
                 clearTimeout(timeoutId);
-                console.error("Proses sinkronisasi latar belakang error:", syncErr);
                 const targetRef = window.doc(window.db, "laporan_dokumentasi", docId);
                 await window.updateDoc(targetRef, { 
                     syncedToDrive: false,
                     syncFailed: true 
                 });
-
-                if (currentUser && currentUser.role === 'admin') {
-                    fetchAdminArchive();
-                } else if (currentUser) {
-                    fetchUserArchive();
-                }
             }
         }
 
-        // FUNGSI UNTUK TRIGGER MANUAL RE-UPLOAD APABILA SINKRONISASI GAGAL
         async function retrySyncGroup(encodedDocIds) {
             try {
                 const docIds = JSON.parse(decodeURIComponent(encodedDocIds));
                 Swal.fire({
                     title: 'Mengirim Ulang...',
-                    text: 'Sedang dikirim ulag ke sistem.',
+                    text: 'Sedang dikirim ulang ke sistem.',
                     allowOutsideClick: false,
                     didOpen: () => { Swal.showLoading(); }
                 });
@@ -830,30 +870,21 @@
                         syncStartTime: now 
                     });
 
-                    // Ambil payload Firestore terbaru untuk disinkronkan kembali
-                    const docSnap = await window.getDocs(window.collection(window.db, "laporan_dokumentasi"));
-                    docSnap.forEach(d => {
-                        if (d.id === docId) {
-                            const data = d.data();
-                            const dateObj = new Date(data.tanggal);
-                            const day = String(dateObj.getDate()).padStart(2, '0');
-                            const monthNames = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
-                            const month = monthNames[dateObj.getMonth()];
-                            const year = dateObj.getFullYear();
-                            const formattedDateFolder = `${day} ${month} ${year}`;
-                            
-                            syncToDriveInBackground(docId, data, formattedDateFolder, data.files ? data.files.length : 0);
-                        }
-                    });
+                    const targetRep = allGlobalReports.find(r => r.id === docId);
+                    if (targetRep) {
+                        const rawDatePart = targetRep.tanggal ? (targetRep.tanggal.includes('T') ? targetRep.tanggal.split('T')[0] : targetRep.tanggal) : '';
+                        const dateObj = rawDatePart ? new Date(rawDatePart + 'T00:00:00') : new Date();
+                        const day = String(dateObj.getDate()).padStart(2, '0');
+                        const monthNames = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
+                        const month = monthNames[dateObj.getMonth()];
+                        const year = dateObj.getFullYear();
+                        const formattedDateFolder = `${day} ${month} ${year}`;
+                        
+                        syncToDriveInBackground(docId, targetRep, formattedDateFolder, targetRep.files ? targetRep.files.length : 0);
+                    }
                 }
 
                 Swal.close();
-                if (currentUser.role === 'admin') {
-                    fetchAdminArchive();
-                } else {
-                    fetchUserArchive();
-                }
-
             } catch (e) {
                 console.error("Gagal Upload Ulang:", e);
                 Swal.fire({ icon: 'error', title: 'Gagal', text: 'Gagal memulai proses ulang.', confirmButtonColor: '#2563eb' });
@@ -885,24 +916,18 @@
               .catch(error => console.error("Gagal Kirim WA:", error));
         }
 
-        // FUNGSI PENGELOMPOKAN DATA BERDASARKAN TANGGAL + INSTANSI + KATEGORI + UPLOADER + STATUS SINKRON
         function groupReports(docsList) {
             const grouped = {};
 
             docsList.forEach(item => {
-                const dateKey = item.tanggal ? item.tanggal.split('T')[0] : 'no-date';
+                const rawDatePart = item.tanggal ? (item.tanggal.includes('T') ? item.tanggal.split('T')[0] : item.tanggal) : 'no-date';
                 
-                // Menentukan status item secara akurat
                 const isSynced = item.syncedToDrive === true;
                 const isFailed = item.syncFailed === true;
                 const statusTag = isSynced ? 'synced' : (isFailed ? 'failed' : 'pending');
-
-                // DIBEDAKAN: Jika sudah berhasil disinkronkan ('synced'), gabungkan semua upload dalam tanggal, uploader, instansi & jenis yang sama.
-                // Jika belum/gagal ('pending'/'failed'), pisahkan berdasarkan batch agar tidak memicu error tombol kuncian.
                 const batchKey = isSynced ? 'synced_combined' : (item.batchGroupId || item.syncStartTime || (item.createdAt ? new Date(item.createdAt).getTime() : 'single'));
 
-                // Kunci grup unik: Memungkinkan foto jenis sama di tanggal yang sama bergabung setelah sinkronisasi berhasil
-                const key = `${dateKey}_${item.uploader}_${item.instansi}_${item.kategori}_${statusTag}_${batchKey}`;
+                const key = `${rawDatePart}_${item.uploader}_${item.instansi}_${item.kategori}_${statusTag}_${batchKey}`;
 
                 if (!grouped[key]) {
                     grouped[key] = {
@@ -910,7 +935,7 @@
                         uploader: item.uploader,
                         instansi: item.instansi,
                         kategori: item.kategori,
-                        tanggal: item.tanggal,
+                        tanggal: rawDatePart,
                         createdAt: item.createdAt,
                         syncStartTime: item.syncStartTime,
                         files: item.files ? [...item.files] : [],
@@ -934,216 +959,150 @@
             return Object.values(grouped);
         }
 
-        async function fetchUserArchive(filter = {}) {
+        // TAMPILAN RIWAYAT USER: Menampilkan Nama Jenis Dokumentasi, Uploader, Tanggal & Status (Tanpa Pratinjau Foto Langsung di List)
+        function renderUserArchiveView(filter = {}) {
             const archiveList = document.getElementById('user-archive-list');
-            archiveList.innerHTML = `<p class="text-center text-slate-400 py-6 text-sm">Memuat arsip...</p>`;
+            if (!archiveList) return;
 
-            try {
-                const querySnapshot = await window.getDocs(window.collection(window.db, "laporan_dokumentasi"));
-                let rawList = [];
-
-                querySnapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    // Mohamad Fahrurozi (Viewer) dapat melihat seluruh foto dari semua uploader
-                    if (currentUser.role === 'viewer' || data.uploader === currentUser.name) {
-                        if (filter.startDate && new Date(data.tanggal) < new Date(filter.startDate)) return;
-                        if (filter.endDate && new Date(data.tanggal) > new Date(filter.endDate + 'T23:59:59')) return;
-                        if (filter.kategori && data.kategori !== filter.kategori) return;
-
-                        rawList.push({ id: docSnap.id, ...data });
-                    }
-                });
-
-                const groupedData = groupReports(rawList);
+            let rawList = [];
+            allGlobalReports.forEach(data => {
+                const itemDatePart = data.tanggal ? (data.tanggal.includes('T') ? data.tanggal.split('T')[0] : data.tanggal) : '';
                 
-                // Evaluasi status sinkronisasi aktif untuk kunci/buka tombol upload (jika user)
-                if (currentUser.role === 'user') {
-                    checkGlobalSyncStatus(groupedData);
+                if (filter.date && itemDatePart !== filter.date) return;
+                if (filter.kategori && data.kategori !== filter.kategori) return;
+
+                rawList.push(data);
+            });
+
+            const groupedData = groupReports(rawList);
+            
+            if (currentUser && currentUser.role === 'user') {
+                checkGlobalSyncStatus(groupedData);
+            }
+
+            let html = "";
+            groupedData.forEach(item => {
+                const dateStr = item.tanggal ? new Date(item.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-';
+                
+                let syncStatusHtml = "";
+                if (item.syncedToDrive === true) {
+                    syncStatusHtml = `<span class="inline-flex items-center text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-semibold"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Terkirim</span>`;
+                } else if (item.syncFailed === true) {
+                    syncStatusHtml = `<span class="inline-flex items-center text-[10px] bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded font-bold"><i class="fa-solid fa-circle-xmark text-rose-500 mr-1"></i> Gagal</span>`;
+                } else {
+                    syncStatusHtml = `<span class="inline-flex items-center text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded font-semibold"><i class="fa-solid fa-sync fa-spin text-amber-500 mr-1"></i> Mengirim...</span>`;
                 }
 
-                let html = "";
+                html += `
+                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 shadow-sm hover:border-blue-300 transition">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-1">
+                                <span class="text-xs font-bold uppercase tracking-wide text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-lg">${item.kategori}</span>
+                                ${syncStatusHtml}
+                            </div>
+                            <p class="text-xs text-slate-500"><i class="fa-regular fa-calendar mr-1"></i> ${dateStr} &bull; Diunggah oleh: <b class="text-slate-700">${item.uploader}</b> (${item.files.length} Foto)</p>
+                        </div>
+                    </div>
+                `;
+            });
 
-                groupedData.forEach(item => {
-                    html += renderArchiveCard(item);
-                });
-
-                document.getElementById('user-count-badge').innerText = `${groupedData.length} Laporan`;
-                archiveList.innerHTML = html || `<p class="text-center text-slate-400 py-10 text-sm">Belum ada riwayat dokumen diunggah dalam rentang tanggal / kategori tersebut.</p>`;
-            } catch (err) {
-                console.error(err);
-                archiveList.innerHTML = `<p class="text-center text-rose-500 py-6 text-sm">Gagal memuat data arsip.</p>`;
-            }
+            document.getElementById('user-count-badge').innerText = `${groupedData.length} Laporan`;
+            archiveList.innerHTML = html || `<p class="text-center text-slate-400 py-10 text-sm">Belum ada riwayat dokumen diunggah untuk tanggal tersebut.</p>`;
         }
 
         function applyUserFilter() {
-            const startDate = document.getElementById('user-filter-start-date').value;
-            const endDate = document.getElementById('user-filter-end-date').value;
+            const dateFilter = document.getElementById('user-filter-date').value;
             const kategori = document.getElementById('user-filter-kategori').value;
-            fetchUserArchive({ startDate, endDate, kategori });
+            renderUserArchiveView({ date: dateFilter, kategori: kategori });
         }
 
         function resetUserFilter() {
-            document.getElementById('user-filter-start-date').value = '';
-            document.getElementById('user-filter-end-date').value = '';
-            document.getElementById('user-filter-kategori').value = '';
-            fetchUserArchive();
-        }
-
-        async function fetchAdminArchive(filter = {}) {
-            const tbody = document.getElementById('admin-archive-list');
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-slate-400 py-8">Memuat arsip lengkap...</td></tr>`;
-
-            try {
-                const querySnapshot = await window.getDocs(window.collection(window.db, "laporan_dokumentasi"));
-                let rawList = [];
-
-                querySnapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    
-                    if (filter.startDate && new Date(data.tanggal) < new Date(filter.startDate)) return;
-                    if (filter.endDate && new Date(data.tanggal) > new Date(filter.endDate + 'T23:59:59')) return;
-                    if (filter.instansi && !data.instansi.toLowerCase().includes(filter.instansi.toLowerCase())) return;
-
-                    rawList.push({ id: docSnap.id, ...data });
-                });
-
-                const groupedData = groupReports(rawList);
-
-                // Evaluasi status sinkronisasi aktif untuk kunci/buka tombol upload
-                checkGlobalSyncStatus(groupedData);
-
-                let rows = "";
-
-                groupedData.forEach(data => {
-                    const dateFormatted = new Date(data.tanggal).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
-                    
-                    let photosHtml = `<div class="flex space-x-1 overflow-x-auto py-1 max-w-xs">`;
-                    if (data.files && data.files.length > 0) {
-                        data.files.forEach(f => {
-                            photosHtml += `<img src="${f.fileData}" onclick="openPhotoModal('${f.fileData}', '${f.fileName}')" class="w-12 h-12 object-cover rounded-lg border hover:scale-105 transition cursor-pointer shadow-sm" title="Klik untuk lihat pratinjau jernih">`;
-                        });
-                    }
-                    photosHtml += `</div>`;
-
-                    const safeDocIds = encodeURIComponent(JSON.stringify(data.docIds));
-
-                    // PENANGANAN STATUS TIMEOUT 35 DETIK DENGAN EVALUASI WAKTU TERTENTU
-                    const now = Date.now();
-                    const startTime = data.syncStartTime || (data.createdAt ? new Date(data.createdAt).getTime() : now);
-                    const isTimedOut = (now - startTime > 35000) && (data.syncedToDrive !== true);
-
-                    let syncBadge = "";
-                    if (data.syncedToDrive === true) {
-                        syncBadge = `<span class="inline-flex items-center text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-medium" title="Berhasil dikirim ke sistem">
-                            <i class="fa-solid fa-circle-check mr-1.5 text-emerald-500"></i> Terkirim
-                         </span>`;
-                    } else if (data.syncFailed === true || isTimedOut) {
-                        syncBadge = `<div class="flex flex-col items-center gap-1">
-                            <span class="inline-flex items-center text-xs text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full font-semibold" title="Gagal tersimpan dalam 30-40 detik">
-                                <i class="fa-solid fa-circle-xmark mr-1.5 text-rose-500"></i> Gagal Dikirim
-                            </span>
-                            <button onclick="retrySyncGroup('${safeDocIds}')" class="text-[10px] bg-rose-600 hover:bg-rose-700 text-white px-2 py-0.5 rounded shadow transition">
-                                <i class="fa-solid fa-rotate-right mr-1"></i> Kirim Ulang
-                            </button>
-                         </div>`;
-                    } else {
-                        syncBadge = `<span class="inline-flex items-center text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full font-medium" title="Sedang diproses ke Sistem">
-                            <i class="fa-solid fa-spinner fa-spin mr-1.5 text-amber-500"></i> Sedang Dikirim...
-                         </span>`;
-                    }
-
-                    const safeFileNames = data.files ? encodeURIComponent(JSON.stringify(data.files.map(f => f.fileName))) : encodeURIComponent(JSON.stringify([]));
-
-                    rows += `
-                        <tr class="hover:bg-slate-50/80 transition">
-                            <td class="py-3 px-4 text-xs text-slate-600">${dateFormatted}</td>
-                            <td class="py-3 px-4 font-semibold text-slate-800">
-                                <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs">${data.uploader}</span>
-                            </td>
-                            <td class="py-3 px-4 text-slate-700">${data.instansi}</td>
-                            <td class="py-3 px-4 text-slate-700 font-medium text-xs">${data.kategori}</td>
-                            <td class="py-3 px-4">${photosHtml}</td>
-                            <td class="py-3 px-4 text-center">${syncBadge}</td>
-                            <td class="py-3 px-4 text-center">
-                                <button onclick="deleteReportGroup('${safeDocIds}', '${data.kategori}', '${safeFileNames}')" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Hapus Laporan & Foto">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                tbody.innerHTML = rows || `<tr><td colspan="7" class="text-center text-slate-400 py-8">Tidak ada data arsip yang ditemukan.</td></tr>`;
-            } catch (err) {
-                console.error(err);
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-rose-500 py-8">Gagal memuat arsip admin.</td></tr>`;
-            }
-        }
-
-        function renderArchiveCard(data) {
-            const dateStr = new Date(data.tanggal).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
             
-            let imagesGrid = `<div class="grid grid-cols-4 sm:grid-cols-6 gap-2 mt-3">`;
-            if (data.files) {
-                data.files.forEach(f => {
-                    imagesGrid += `<img src="${f.fileData}" onclick="openPhotoModal('${f.fileData}', '${f.fileName}')" class="w-full h-16 object-cover rounded-lg border hover:opacity-90 transition cursor-pointer" title="Klik untuk pratinjau besar">`;
-                });
-            }
-            imagesGrid += `</div>`;
+            document.getElementById('user-filter-date').value = todayStr;
+            document.getElementById('user-filter-kategori').value = '';
+            
+            renderUserArchiveView({ date: todayStr });
+        }
 
-            const safeDocIds = encodeURIComponent(JSON.stringify(data.docIds));
+        function renderAdminArchiveView(filter = {}) {
+            const tbody = document.getElementById('admin-archive-list');
+            if (!tbody) return;
 
-            // PENANGANAN STATUS TIMEOUT 35 DETIK DENGAN EVALUASI WAKTU TERTENTU
-            const now = Date.now();
-            const startTime = data.syncStartTime || (data.createdAt ? new Date(data.createdAt).getTime() : now);
-            const isTimedOut = (now - startTime > 35000) && (data.syncedToDrive !== true);
+            let rawList = [];
+            allGlobalReports.forEach(data => {
+                const itemDatePart = data.tanggal ? (data.tanggal.includes('T') ? data.tanggal.split('T')[0] : data.tanggal) : '';
 
-            let syncStatusHtml = "";
-            if (data.syncedToDrive === true) {
-                syncStatusHtml = `<span class="inline-flex items-center text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md font-semibold">
-                    <i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Berhasil Terkirim
-                 </span>`;
-            } else if (data.syncFailed === true || isTimedOut) {
-                syncStatusHtml = `<div class="flex items-center gap-1.5">
-                    <span class="inline-flex items-center text-[11px] bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-md font-bold">
-                        <i class="fa-solid fa-circle-xmark text-rose-500 mr-1"></i> Gagal (Wajib Upload Ulang)
-                    </span>
-                    ${currentUser.role !== 'viewer' ? `
-                    <button onclick="retrySyncGroup('${safeDocIds}')" class="text-[10px] bg-rose-600 hover:bg-rose-700 text-white px-2 py-0.5 rounded shadow transition">
-                        <i class="fa-solid fa-rotate-right mr-1"></i> Upload Ulang
-                    </button>
-                    ` : ''}
-                </div>`;
-            } else {
-                syncStatusHtml = `<span class="inline-flex items-center text-[11px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-md font-semibold">
-                    <i class="fa-solid fa-sync fa-spin text-amber-500 mr-1"></i> Sedang Dikirim...
-                 </span>`;
-            }
+                if (filter.date && itemDatePart !== filter.date) return;
+                if (filter.kategori && data.kategori !== filter.kategori) return;
 
-            const safeFileNames = encodeURIComponent(JSON.stringify(data.files ? data.files.map(f => f.fileName) : []));
+                rawList.push(data);
+            });
 
-            const deleteButtonHtml = currentUser.role === 'admin' ? `
-                <button onclick="deleteReportGroup('${safeDocIds}', '${data.kategori}', '${safeFileNames}')" class="text-rose-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-100/50 transition text-sm">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-            ` : '';
+            const groupedData = groupReports(rawList);
+            checkGlobalSyncStatus(groupedData);
 
-            return `
-                <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 relative group">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <div class="flex flex-wrap items-center gap-2 mb-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-2 py-0.5 rounded">${data.kategori}</span>
-                                ${syncStatusHtml}
-                            </div>
-                            <h4 class="font-bold text-slate-800 text-sm">Instansi: ${data.instansi}</h4>
-                            <p class="text-xs text-slate-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i> Tanggal Laporan: <b>${dateStr}</b> | Diunggah oleh: <b>${data.uploader}</b></p>
-                        </div>
-                        ${deleteButtonHtml}
-                    </div>
-                    ${imagesGrid}
-                </div>
-            `;
+            let rows = "";
+            groupedData.forEach(data => {
+                const dateFormatted = data.tanggal ? new Date(data.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-';
+                
+                let photosHtml = `<div class="flex space-x-1 overflow-x-auto py-1 max-w-xs">`;
+                if (data.files && data.files.length > 0) {
+                    data.files.forEach(f => {
+                        photosHtml += `<img src="${f.fileData}" onclick="openPhotoModal('${f.fileData}', '${f.fileName}')" class="w-12 h-12 object-cover rounded-lg border hover:scale-105 transition cursor-pointer shadow-sm" title="Klik untuk lihat pratinjau jernih">`;
+                    });
+                }
+                photosHtml += `</div>`;
+
+                const safeDocIds = encodeURIComponent(JSON.stringify(data.docIds));
+
+                const now = Date.now();
+                const startTime = data.syncStartTime || (data.createdAt ? new Date(data.createdAt).getTime() : now);
+                const isTimedOut = (now - startTime > 35000) && (data.syncedToDrive !== true);
+
+                let syncBadge = "";
+                if (data.syncedToDrive === true) {
+                    syncBadge = `<span class="inline-flex items-center text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-medium" title="Berhasil dikirim ke sistem">
+                        <i class="fa-solid fa-circle-check mr-1.5 text-emerald-500"></i> Terkirim
+                     </span>`;
+                } else if (data.syncFailed === true || isTimedOut) {
+                    syncBadge = `<div class="flex flex-col items-center gap-1">
+                        <span class="inline-flex items-center text-xs text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full font-semibold" title="Gagal tersimpan dalam 35 detik">
+                            <i class="fa-solid fa-circle-xmark mr-1.5 text-rose-500"></i> Gagal Dikirim
+                        </span>
+                        <button onclick="retrySyncGroup('${safeDocIds}')" class="text-[10px] bg-rose-600 hover:bg-rose-700 text-white px-2 py-0.5 rounded shadow transition">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Kirim Ulang
+                        </button>
+                     </div>`;
+                } else {
+                    syncBadge = `<span class="inline-flex items-center text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full font-medium" title="Sedang diproses ke Sistem">
+                        <i class="fa-solid fa-spinner fa-spin mr-1.5 text-amber-500"></i> Sedang Dikirim...
+                     </span>`;
+                }
+
+                const safeFileNames = data.files ? encodeURIComponent(JSON.stringify(data.files.map(f => f.fileName))) : encodeURIComponent(JSON.stringify([]));
+
+                rows += `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="py-3 px-4 text-xs text-slate-600">${dateFormatted}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">
+                            <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs">${data.uploader}</span>
+                        </td>
+                        <td class="py-3 px-4 text-slate-700">${data.instansi}</td>
+                        <td class="py-3 px-4 text-slate-700 font-medium text-xs">${data.kategori}</td>
+                        <td class="py-3 px-4">${photosHtml}</td>
+                        <td class="py-3 px-4 text-center">${syncBadge}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="deleteReportGroup('${safeDocIds}', '${data.kategori}', '${safeFileNames}')" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Hapus Laporan & Foto">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = rows || `<tr><td colspan="7" class="text-center text-slate-400 py-8">Tidak ada data arsip yang ditemukan untuk tanggal tersebut.</td></tr>`;
         }
 
         function openPhotoModal(imgSrc, fileName = 'dokumentasi.jpg') {
@@ -1204,12 +1163,6 @@
                             timer: 2000,
                             showConfirmButton: false
                         });
-
-                        if (currentUser.role === 'admin') {
-                            fetchAdminArchive();
-                        } else {
-                            fetchUserArchive();
-                        }
                     } catch (err) {
                         console.error("Gagal hapus:", err);
                         Swal.fire({
@@ -1224,17 +1177,19 @@
         }
 
         function applyAdminFilter() {
-            const startDate = document.getElementById('filter-start-date').value;
-            const endDate = document.getElementById('filter-end-date').value;
-            const instansi = document.getElementById('filter-instansi').value;
-            fetchAdminArchive({ startDate, endDate, instansi });
+            const dateFilter = document.getElementById('filter-date').value;
+            const kategori = document.getElementById('filter-kategori').value;
+            renderAdminArchiveView({ date: dateFilter, kategori: kategori });
         }
 
         function resetAdminFilter() {
-            document.getElementById('filter-start-date').value = '';
-            document.getElementById('filter-end-date').value = '';
-            document.getElementById('filter-instansi').value = '';
-            fetchAdminArchive();
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            
+            document.getElementById('filter-date').value = todayStr;
+            document.getElementById('filter-kategori').value = '';
+            
+            renderAdminArchiveView({ date: todayStr });
         }
     </script>
 </body>
