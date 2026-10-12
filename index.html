@@ -140,10 +140,9 @@
                             </select>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Foto (Minimal 2 Foto, Maksimal Tak Terbatas)</label>
-                            <input type="file" id="input-files" multiple accept="image/*" required 
-                                class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                        <!-- Bagian Khusus Kolom Upload Foto (Dinamis per User) -->
+                        <div id="dynamic-upload-container" class="space-y-3">
+                            <!-- Diisi secara dinamis via JS berdasarkan user yang login -->
                         </div>
 
                         <button type="submit" id="btn-upload" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition shadow-md disabled:bg-slate-300 disabled:cursor-not-allowed">
@@ -540,6 +539,35 @@
             }
         }
 
+        function renderDynamicUploadInputs() {
+            const container = document.getElementById('dynamic-upload-container');
+            if (!container) return;
+
+            const isLili = currentUser && (currentUser.username.toLowerCase() === 'lili' || currentUser.name.toLowerCase() === 'lili');
+
+            if (isLili) {
+                let html = `<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Upload Foto (Tepat 10 Kolom / Baris, Minimal 1 Maksimal Bebas per Kolom)</label>`;
+                for (let i = 1; i <= 10; i++) {
+                    html += `
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                            <span class="block text-[11px] font-bold text-blue-700">Kolom Foto ${i}</span>
+                            <input type="file" id="input-file-lili-${i}" accept="image/*" 
+                                class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Foto (Minimal 2 Foto, Maksimal Tak Terbatas)</label>
+                        <input type="file" id="input-files" multiple accept="image/*" required 
+                            class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                    </div>
+                `;
+            }
+        }
+
         function loadDashboard() {
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('header-nav').classList.remove('hidden');
@@ -547,6 +575,7 @@
             document.getElementById('display-username').innerText = currentUser.name;
 
             setTodayDate();
+            renderDynamicUploadInputs();
 
             const now = new Date();
             const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -699,7 +728,6 @@
             const tanggalPilih = document.getElementById('input-tanggal-laporan').value;
             const instansi = document.getElementById('input-instansi').value;
             const kategori = document.getElementById('input-kategori').value;
-            const fileInput = document.getElementById('input-files');
             const btnUpload = document.getElementById('btn-upload');
 
             if (!tanggalPilih || !kategori) {
@@ -707,9 +735,32 @@
                 return;
             }
 
-            if (fileInput.files.length < 2) {
-                Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Pilih minimal 2 foto untuk melanjutkan!', confirmButtonColor: '#2563eb' });
-                return;
+            const isLiliUser = currentUser && (currentUser.username.toLowerCase() === 'lili' || currentUser.name.toLowerCase() === 'lili');
+            let rawFilesArray = [];
+
+            if (isLiliUser) {
+                for (let i = 1; i <= 10; i++) {
+                    const fileInputRow = document.getElementById(`input-file-lili-${i}`);
+                    if (fileInputRow && fileInputRow.files.length > 0) {
+                        for (let f = 0; f < fileInputRow.files.length; f++) {
+                            rawFilesArray.push(fileInputRow.files[f]);
+                        }
+                    }
+                }
+
+                if (rawFilesArray.length === 0) {
+                    Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Pilih minimal 1 foto dari kolom yang tersedia untuk melanjutkan!', confirmButtonColor: '#2563eb' });
+                    return;
+                }
+            } else {
+                const fileInput = document.getElementById('input-files');
+                if (!fileInput || fileInput.files.length < 2) {
+                    Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Pilih minimal 2 foto untuk melanjutkan!', confirmButtonColor: '#2563eb' });
+                    return;
+                }
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    rawFilesArray.push(fileInput.files[i]);
+                }
             }
 
             btnUpload.disabled = true;
@@ -725,8 +776,8 @@
 
                 let allCompressedFiles = [];
 
-                for (let i = 0; i < fileInput.files.length; i++) {
-                    const file = fileInput.files[i];
+                for (let i = 0; i < rawFilesArray.length; i++) {
+                    const file = rawFilesArray[i];
                     const base64 = await compressImageAndGetBase64(file);
                     
                     allCompressedFiles.push({
@@ -773,6 +824,7 @@
                 document.getElementById('input-instansi').value = "SPPG KOTA SERANG SERANG SERANG 2";
                 isDateManuallyModified = false;
                 setTodayDate();
+                renderDynamicUploadInputs();
 
                 Swal.fire({
                     html: `
