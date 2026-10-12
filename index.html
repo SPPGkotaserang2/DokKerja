@@ -350,7 +350,7 @@
     </script>
 
     <script>
-        const FONNTE_TOKEN = "uJ8CF79nyQaJbPrVGeeE";
+        const FONNTE_TOKEN = "N1L5tFSqGg2BJQVD42SC";
         const FONNTE_TARGET = "6283111399112";
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-tiExkycqhueEVFrhgNYuT02mIBLz-fL2uWnqW6J7YX__H8WVau6dDUFhfUsqBPO3/exec";
 
@@ -624,10 +624,8 @@
         async function compressImageAndGetBase64(file, maxWidth = 800, quality = 0.55) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.readAsDataURL(file);
                 reader.onload = (event) => {
                     const img = new Image();
-                    img.src = event.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         let width = img.width;
@@ -648,8 +646,10 @@
                         resolve(base64String);
                     };
                     img.onerror = (error) => reject(error);
+                    img.src = event.target.result;
                 };
                 reader.onerror = (error) => reject(error);
+                reader.readAsDataURL(file);
             });
         }
 
@@ -959,7 +959,6 @@
             return Object.values(grouped);
         }
 
-        // TAMPILAN RIWAYAT USER: Menampilkan Nama Jenis Dokumentasi, Uploader, Tanggal & Status (Tanpa Pratinjau Foto Langsung di List)
         function renderUserArchiveView(filter = {}) {
             const archiveList = document.getElementById('user-archive-list');
             if (!archiveList) return;
