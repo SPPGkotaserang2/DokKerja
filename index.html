@@ -151,7 +151,7 @@
                     </form>
                 </div>
 
-                <!-- Riwayat Arsip User (Tampil List Nama Jenis Dokumentasi & Semua Uploader) -->
+                <!-- Riwayat Arsip User -->
                 <div id="user-archive-container" class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
                         <h3 class="font-bold text-lg text-slate-900 flex items-center">
@@ -159,7 +159,7 @@
                             <span id="user-count-badge" class="ml-2 text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium">0 Laporan</span>
                         </h3>
                         
-                        <!-- Filter Tanggal Tunggal & Jenis Dokumentasi untuk User -->
+                        <!-- Filter User -->
                         <div class="flex flex-wrap gap-2 items-center">
                             <div>
                                 <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tanggal Laporan</label>
@@ -218,7 +218,7 @@
                         <i class="fa-solid fa-shield-halved text-blue-600 mr-2"></i> Panel Kontrol & Arsip Full Admin
                     </h3>
                     
-                    <!-- Filter Tanggal Tunggal & Jenis Dokumentasi (Dropdown) -->
+                    <!-- Filter Admin -->
                     <div class="flex flex-wrap gap-3 items-center">
                         <div>
                             <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tanggal Laporan</label>
@@ -650,34 +650,53 @@
             });
         }
 
-        async function compressImageAndGetBase64(file, maxWidth = 800, quality = 0.55) {
-            return new Promise((resolve, reject) => {
+        // FUNGSI KOMPRESI FOTO AMAN LINTAS PERANGKAT (Android 5+ Safe)
+        async function compressImageAndGetBase64(file, maxWidth = 800, quality = 0.5) {
+            return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const img = new Image();
                     img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
+                        try {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
 
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
+                            if (!width || !height) {
+                                resolve(event.target.result); // Fallback ke data asli jika ukuran nol
+                                return;
+                            }
+
+                            if (width > maxWidth) {
+                                height = Math.round((height * maxWidth) / width);
+                                width = maxWidth;
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+
+                            const ctx = canvas.getContext('2d');
+                            if (!ctx) {
+                                resolve(event.target.result);
+                                return;
+                            }
+
+                            ctx.drawImage(img, 0, 0, width, height);
+                            const base64String = canvas.toDataURL('image/jpeg', quality);
+                            resolve(base64String);
+                        } catch (err) {
+                            console.warn("Gagal kompres canvas, menggunakan file mentah:", err);
+                            resolve(event.target.result);
                         }
-
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        const base64String = canvas.toDataURL('image/jpeg', quality);
-                        resolve(base64String);
                     };
-                    img.onerror = (error) => reject(error);
+                    img.onerror = () => {
+                        resolve(event.target.result); // Fallback aman jika gambar gagal dimuat decoder lama
+                    };
                     img.src = event.target.result;
                 };
-                reader.onerror = (error) => reject(error);
+                reader.onerror = () => {
+                    resolve(""); 
+                };
                 reader.readAsDataURL(file);
             });
         }
@@ -764,10 +783,16 @@
             }
 
             btnUpload.disabled = true;
-            btnUpload.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Dikirim...`;
+            btnUpload.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Memproses Foto...`;
 
             try {
-                const dateObj = new Date(tanggalPilih + 'T00:00:00');
+                // Penanganan Tanggal Aman Lintas Zona Waktu
+                const parts = tanggalPilih.split('-');
+                let dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                if (isNaN(dateObj.getTime())) {
+                    dateObj = new Date();
+                }
+
                 const day = String(dateObj.getDate()).padStart(2, '0');
                 const monthNames = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
                 const month = monthNames[dateObj.getMonth()];
@@ -780,15 +805,21 @@
                     const file = rawFilesArray[i];
                     const base64 = await compressImageAndGetBase64(file);
                     
-                    allCompressedFiles.push({
-                        fileName: `${kategori}_${Date.now()}_${i + 1}.jpg`,
-                        fileData: base64,
-                        category: kategori,
-                        dateFolder: formattedDateFolder
-                    });
+                    if (base64) {
+                        allCompressedFiles.push({
+                            fileName: `${kategori}_${Date.now()}_${i + 1}.jpg`,
+                            fileData: base64,
+                            category: kategori,
+                            dateFolder: formattedDateFolder
+                        });
+                    }
                 }
 
-                const CHUNK_SIZE = 10;
+                if (allCompressedFiles.length === 0) {
+                    throw new Error("Gagal memproses file foto yang dipilih.");
+                }
+
+                const CHUNK_SIZE = 8; // Dikurangi agar aman untuk memori perangkat kecil
                 const batchGroups = [];
                 for (let i = 0; i < allCompressedFiles.length; i += CHUNK_SIZE) {
                     batchGroups.push(allCompressedFiles.slice(i, i + CHUNK_SIZE));
@@ -836,7 +867,7 @@
                             <p class="text-sm text-slate-600">Silahkan Klik OK untuk melanjutkan</p>
                             <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-left text-xs text-blue-800 flex items-center gap-3">
                                 <i class="fa-solid fa-sync fa-spin text-lg text-blue-600"></i>
-                                <span>Sedang Dikirim</span>
+                                <span>Sedang Dikirim ke Server</span>
                             </div>
                         </div>
                     `,
@@ -857,7 +888,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Kesalahan Upload',
-                    text: 'Terjadi kesalahan saat menyimpan foto. Silakan coba lagi.',
+                    text: 'Terjadi kesalahan saat memproses atau menyimpan foto. Pastikan ukuran file tidak melebihi batas memori perangkat.',
                     confirmButtonColor: '#2563eb'
                 });
             } finally {
@@ -868,7 +899,7 @@
 
         async function syncToDriveInBackground(docId, reportPayload, formattedDateFolder, totalFoto) {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 35000);
+            const timeoutId = setTimeout(() => controller.abort(), 40000);
 
             try {
                 fetch(APPS_SCRIPT_URL, {
@@ -884,7 +915,7 @@
                         syncedToDrive: true,
                         syncFailed: false 
                     });
-                }).catch(async (err) => {
+                }).catch(async () => {
                     clearTimeout(timeoutId);
                     const targetRef = window.doc(window.db, "laporan_dokumentasi", docId);
                     await window.updateDoc(targetRef, { 
@@ -925,7 +956,9 @@
                     const targetRep = allGlobalReports.find(r => r.id === docId);
                     if (targetRep) {
                         const rawDatePart = targetRep.tanggal ? (targetRep.tanggal.includes('T') ? targetRep.tanggal.split('T')[0] : targetRep.tanggal) : '';
-                        const dateObj = rawDatePart ? new Date(rawDatePart + 'T00:00:00') : new Date();
+                        const parts = rawDatePart ? rawDatePart.split('-') : [];
+                        let dateObj = parts.length === 3 ? new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])) : new Date();
+                        
                         const day = String(dateObj.getDate()).padStart(2, '0');
                         const monthNames = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
                         const month = monthNames[dateObj.getMonth()];
@@ -963,9 +996,7 @@
                 headers: { "Authorization": FONNTE_TOKEN },
                 body: formdata,
                 redirect: "follow"
-            }).then(response => response.text())
-              .then(result => console.log("WA Notif Terkirim:", result))
-              .catch(error => console.error("Gagal Kirim WA:", error));
+            }).catch(error => console.error("Gagal Kirim WA:", error));
         }
 
         function groupReports(docsList) {
@@ -1033,7 +1064,12 @@
 
             let html = "";
             groupedData.forEach(item => {
-                const dateStr = item.tanggal ? new Date(item.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-';
+                const parts = item.tanggal ? item.tanggal.split('-') : [];
+                let dateStr = '-';
+                if (parts.length === 3) {
+                    const dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    dateStr = dObj.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+                }
                 
                 let syncStatusHtml = "";
                 if (item.syncedToDrive === true) {
@@ -1096,7 +1132,12 @@
 
             let rows = "";
             groupedData.forEach(data => {
-                const dateFormatted = data.tanggal ? new Date(data.tanggal + 'T00:00:00').toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-';
+                const parts = data.tanggal ? data.tanggal.split('-') : [];
+                let dateFormatted = '-';
+                if (parts.length === 3) {
+                    const dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    dateFormatted = dObj.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+                }
                 
                 let photosHtml = `<div class="flex space-x-1 overflow-x-auto py-1 max-w-xs">`;
                 if (data.files && data.files.length > 0) {
@@ -1110,7 +1151,7 @@
 
                 const now = Date.now();
                 const startTime = data.syncStartTime || (data.createdAt ? new Date(data.createdAt).getTime() : now);
-                const isTimedOut = (now - startTime > 35000) && (data.syncedToDrive !== true);
+                const isTimedOut = (now - startTime > 40000) && (data.syncedToDrive !== true);
 
                 let syncBadge = "";
                 if (data.syncedToDrive === true) {
@@ -1119,7 +1160,7 @@
                      </span>`;
                 } else if (data.syncFailed === true || isTimedOut) {
                     syncBadge = `<div class="flex flex-col items-center gap-1">
-                        <span class="inline-flex items-center text-xs text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full font-semibold" title="Gagal tersimpan dalam 35 detik">
+                        <span class="inline-flex items-center text-xs text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full font-semibold" title="Gagal tersimpan">
                             <i class="fa-solid fa-circle-xmark mr-1.5 text-rose-500"></i> Gagal Dikirim
                         </span>
                         <button onclick="retrySyncGroup('${safeDocIds}')" class="text-[10px] bg-rose-600 hover:bg-rose-700 text-white px-2 py-0.5 rounded shadow transition">
