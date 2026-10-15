@@ -113,6 +113,24 @@
                 </div>
             </div>
 
+            <!-- SPANDUK PERINGATAN UPLOAD -->
+            <div id="upload-reminder-banner" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-xl shadow-sm hidden">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl mt-0.5"></i>
+                    </div>
+                    <div class="ml-3 w-full">
+                        <h3 class="text-sm font-bold text-amber-800">PERINGATAN DOKUMENTASI BELUM LENGKAP!</h3>
+                        <p id="reminder-text" class="text-xs text-amber-700 mt-1 leading-relaxed">
+                            Mohon periksa dan unggah foto dokumentasi yang masih belum diunggah untuk hari ini.
+                        </p>
+                        <div id="missing-categories-tags" class="mt-2 flex flex-wrap gap-1.5">
+                            <!-- Tag kategori yang belum diupload dimasukkan via Javascript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TAB CONTAINER UNTUK USER & ADMIN -->
             <div id="user-panel" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Form Upload User / Admin -->
@@ -407,13 +425,14 @@
             "FOTO PERBAIKAN DAPUR/LAINNYA JIKA DA"
         ];
 
+        // FUNGSI MEMPERBARUI DROPDOWN & STATUS PERINGATAN KATEGORI
         function updateCategoryDropdownOptions() {
             const selectEl = document.getElementById('input-kategori');
             const selectedDateInput = document.getElementById('input-tanggal-laporan');
-            if (!selectEl || !selectedDateInput) return;
+            if (!selectedDateInput) return;
 
             const chosenDate = selectedDateInput.value;
-            const currentSelectedVal = selectEl.value;
+            const currentSelectedVal = selectEl ? selectEl.value : "";
 
             const uploadedCategoriesToday = new Set();
             allGlobalReports.forEach(rep => {
@@ -423,19 +442,47 @@
                 }
             });
 
-            let optionsHtml = `<option value="">-- Pilih Jenis Dokumentasi --</option>`;
-            ALL_CATEGORIES.forEach(cat => {
-                if (!uploadedCategoriesToday.has(cat)) {
-                    optionsHtml += `<option value="${cat}">${cat}</option>`;
-                }
-            });
+            // Opsi jenis dokumentasi TIDAK DIHILANGKAN meskipun sudah pernah diupload
+            if (selectEl) {
+                let optionsHtml = `<option value="">-- Pilih Jenis Dokumentasi --</option>`;
+                ALL_CATEGORIES.forEach(cat => {
+                    const isDone = uploadedCategoriesToday.has(cat);
+                    const labelStr = isDone ? `${cat} (Sudah Diupload)` : cat;
+                    optionsHtml += `<option value="${cat}">${labelStr}</option>`;
+                });
 
-            selectEl.innerHTML = optionsHtml;
-            
-            if (currentSelectedVal && !uploadedCategoriesToday.has(currentSelectedVal)) {
-                selectEl.value = currentSelectedVal;
+                selectEl.innerHTML = optionsHtml;
+                if (currentSelectedVal) {
+                    selectEl.value = currentSelectedVal;
+                }
+            }
+
+            // CEK DAN TAMPILKAN PERINGATAN JIKA ADA KATEGORI BELUM DIUPLOAD
+            checkAndShowUploadReminder(chosenDate, uploadedCategoriesToday);
+        }
+
+        function checkAndShowUploadReminder(chosenDate, uploadedSet) {
+            const banner = document.getElementById('upload-reminder-banner');
+            const missingContainer = document.getElementById('missing-categories-tags');
+            const reminderText = document.getElementById('reminder-text');
+            if (!banner || !missingContainer) return;
+
+            const missingCategories = ALL_CATEGORIES.filter(cat => !uploadedSet.has(cat));
+
+            if (missingCategories.length > 0) {
+                reminderText.innerText = `Ada ${missingCategories.length} jenis foto dokumentasi yang BELUM diunggah untuk tanggal (${chosenDate}). Mohon segera lengkapi!`;
+                
+                let tagsHtml = "";
+                missingCategories.forEach(cat => {
+                    tagsHtml += `<span class="bg-amber-200/80 text-amber-900 border border-amber-300 px-2 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1">
+                        <i class="fa-solid fa-clock text-amber-700"></i> ${cat}
+                    </span>`;
+                });
+                
+                missingContainer.innerHTML = tagsHtml;
+                banner.classList.remove('hidden');
             } else {
-                selectEl.value = "";
+                banner.classList.add('hidden');
             }
         }
 
@@ -558,12 +605,12 @@
             const isLili = currentUser && (currentUser.username.toLowerCase() === 'lili' || currentUser.name.toLowerCase() === 'lili');
 
             if (isLili) {
-                let html = `<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Upload Foto (Tepat 10 Kolom / Baris, Minimal 1 Maksimal Bebas per Kolom)</label>`;
+                let html = `<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Upload Foto (10 Kolom/Baris, Minimal 1 Maksimal Bebas per Kolom)</label>`;
                 for (let i = 1; i <= 10; i++) {
                     html += `
                         <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
                             <span class="block text-[11px] font-bold text-blue-700">Kolom Foto ${i}</span>
-                            <input type="file" id="input-file-lili-${i}" accept="image/*" 
+                            <input type="file" id="input-file-lili-${i}" accept="image/*" multiple
                                 class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
                         </div>
                     `;
@@ -572,7 +619,7 @@
             } else {
                 container.innerHTML = `
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Foto (Minimal 2 Foto, Maksimal Tak Terbatas)</label>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Foto (Minimal 1 Foto, Maksimal Bebas)</label>
                         <input type="file" id="input-files" multiple accept="image/*" required 
                             class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
                     </div>
@@ -785,8 +832,8 @@
                 }
             } else {
                 const fileInput = document.getElementById('input-files');
-                if (!fileInput || fileInput.files.length < 2) {
-                    Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Pilih minimal 2 foto untuk melanjutkan!', confirmButtonColor: '#2563eb' });
+                if (!fileInput || fileInput.files.length < 1) {
+                    Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Pilih minimal 1 foto untuk melanjutkan!', confirmButtonColor: '#2563eb' });
                     return;
                 }
                 for (let i = 0; i < fileInput.files.length; i++) {
