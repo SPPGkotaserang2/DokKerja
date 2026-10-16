@@ -39,12 +39,10 @@
             </div>
             
             <div class="flex items-center space-x-4">
-                <!-- Tombol Refresh Browser -->
-                <button onclick="location.reload(true)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center shadow-sm" title="Refresh Halaman & Sinkronisasi Kode">
+                <button onclick="location.reload(true)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center shadow-sm" title="Refresh Halaman">
                     <i class="fa-solid fa-rotate mr-1.5 text-blue-600"></i> Refresh
                 </button>
 
-                <!-- Indikator Kecepatan Jaringan -->
                 <div class="hidden sm:flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600">
                     <span id="network-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span id="network-status">Memeriksa Jaringan...</span>
@@ -107,7 +105,6 @@
 
         <!-- KELOMPOK 2: DASHBOARD USER & ADMIN -->
         <section id="dashboard-section" class="hidden space-y-6">
-            <!-- Welcome Banner -->
             <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 id="welcome-message" class="text-2xl font-bold">Selamat Datang</h2>
@@ -118,7 +115,6 @@
                 </div>
             </div>
 
-            <!-- TAB CONTAINER UNTUK USER & ADMIN -->
             <div id="user-panel" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Form Upload User / Admin -->
                 <div id="upload-form-container" class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -145,18 +141,12 @@
                             </select>
                         </div>
 
-                        <!-- Bagian Khusus Input Relawan (Khusus Divisi Persiapan) -->
                         <div id="relawan-container" class="hidden space-y-2 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                             <label class="block text-xs font-semibold text-slate-700 uppercase">Pilih / Ganti Nama Relawan Hadir:</label>
-                            <div id="relawan-checkboxes" class="space-y-1.5 text-xs text-slate-600 max-h-40 overflow-y-auto">
-                                <!-- Dibuat dinamis via JavaScript -->
-                            </div>
+                            <div id="relawan-checkboxes" class="space-y-1.5 text-xs text-slate-600 max-h-40 overflow-y-auto"></div>
                         </div>
 
-                        <!-- Bagian Khusus Kolom Upload Foto -->
-                        <div id="dynamic-upload-container" class="space-y-3">
-                            <!-- Diisi secara dinamis via JS -->
-                        </div>
+                        <div id="dynamic-upload-container" class="space-y-3"></div>
 
                         <button type="submit" id="btn-upload" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition shadow-md disabled:bg-slate-300 disabled:cursor-not-allowed">
                             <i class="fa-solid fa-upload mr-1"></i> Kirim Laporan
@@ -164,7 +154,7 @@
                     </form>
                 </div>
 
-                <!-- Riwayat Arsip User (Tanpa Menampilkan Foto agar Instan) -->
+                <!-- Riwayat Arsip User -->
                 <div id="user-archive-container" class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
                         <h3 class="font-bold text-lg text-slate-900 flex items-center">
@@ -172,7 +162,6 @@
                             <span id="user-count-badge" class="ml-2 text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium">0 Laporan</span>
                         </h3>
                         
-                        <!-- Filter User -->
                         <div class="flex flex-wrap gap-2 items-center">
                             <div>
                                 <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tanggal Laporan</label>
@@ -237,7 +226,6 @@
                         <i class="fa-solid fa-shield-halved text-blue-600 mr-2"></i> Panel Kontrol & Arsip Full Admin
                     </h3>
                     
-                    <!-- Filter Admin Lengkap (Tanggal, Divisi, dan Jenis Dokumentasi) -->
                     <div class="flex flex-wrap gap-3 items-center">
                         <div>
                             <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tanggal Laporan</label>
@@ -304,7 +292,6 @@
                     </div>
                 </div>
 
-                <!-- Tabel Data Arsip Admin -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -330,7 +317,7 @@
 
     </main>
 
-    <!-- MODAL PRATINJAU FOTO & TOMBOL UNDUH -->
+    <!-- MODAL PRATINJAU FOTO -->
     <div id="photo-modal" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4">
         <div class="relative max-w-4xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col">
             <div class="flex justify-between items-center p-4 border-b bg-slate-50">
@@ -393,7 +380,6 @@
         const FONNTE_TARGET = "6283111399112";
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-tiExkycqhueEVFrhgNYuT02mIBLz-fL2uWnqW6J7YX__H8WVau6dDUFhfUsqBPO3/exec";
 
-        // DATABASE AKUN LENGKAP DENGAN DIVISI & HAK AKSESNYA
         const usersDB = {
             "Serang": { pass: "Mandiri02srg", role: "admin", name: "Admin", division: "ADMIN" },
             "Muamar": { pass: "Muamar2", role: "user", name: "Muamar", division: "SECURITY", allowed: [
@@ -465,7 +451,6 @@
         };
 
         let currentUser = null;
-        let isSyncingActive = false; 
         let isDateManuallyModified = false; 
         let allGlobalReports = []; 
 
@@ -809,46 +794,52 @@
             });
         }
 
+        // PERBAIKAN UTAMA: Kompresi Gambar Super Aman & Kompatibel untuk Android 5+ s/d Terbaru
         async function applyWatermarkAndCompress(file, category, uploaderName) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onerror = () => resolve(null);
                 reader.onload = (event) => {
                     const img = new Image();
-                    img.onerror = () => resolve(event.target.result);
+                    img.onerror = () => resolve(event.target.result); // Fallback jika gagal load gambar
                     img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        const maxWidth = 700;
+                        try {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            const maxWidth = 600; // Ukuran diperkecil agar sangat ringan di HP lama & muat di Firestore
 
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
+                            if (width > maxWidth) {
+                                height = Math.round((height * maxWidth) / width);
+                                width = maxWidth;
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            const now = new Date();
+                            const timeStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) + ' ' + now.toLocaleTimeString('id-ID');
+                            const locationStr = "Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Banten";
+                            const brandStr = "SPPG KOTA SERANG SERANG SERANG 2 - Uploader: " + uploaderName;
+
+                            ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+                            ctx.fillRect(10, height - 60, width - 20, 50);
+
+                            ctx.fillStyle = "#ffffff";
+                            ctx.font = "bold 10px sans-serif";
+                            ctx.fillText(timeStr, 15, height - 42);
+                            ctx.font = "9px sans-serif";
+                            ctx.fillText(locationStr, 15, height - 27);
+                            ctx.fillStyle = "#38bdf8";
+                            ctx.fillText(brandStr, 15, height - 12);
+
+                            // Kualitas kompresi 0.4 (40%) agar ukuran file Base64 kecil dan tidak bikin error memori perangkat
+                            resolve(canvas.toDataURL('image/jpeg', 0.4));
+                        } catch (err) {
+                            resolve(event.target.result); // Fallback aman jika canvas error di perangkat tertentu
                         }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        const now = new Date();
-                        const timeStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) + ' ' + now.toLocaleTimeString('id-ID');
-                        const locationStr = "Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Banten";
-                        const brandStr = "SPPG KOTA SERANG SERANG SERANG 2 - Uploader: " + uploaderName;
-
-                        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-                        ctx.fillRect(10, height - 70, width - 20, 60);
-
-                        ctx.fillStyle = "#ffffff";
-                        ctx.font = "bold 11px sans-serif";
-                        ctx.fillText(timeStr, 15, height - 50);
-                        ctx.font = "10px sans-serif";
-                        ctx.fillText(locationStr, 15, height - 33);
-                        ctx.fillStyle = "#38bdf8";
-                        ctx.fillText(brandStr, 15, height - 16);
-
-                        resolve(canvas.toDataURL('image/jpeg', 0.45));
                     };
                     img.src = event.target.result;
                 };
@@ -930,8 +921,9 @@
                 const uploadBatchGroupId = Date.now().toString();
                 const syncStartTime = Date.now();
 
-                for (let i = 0; i < allCompressedFiles.length; i += 2) {
-                    const fileChunk = allCompressedFiles.slice(i, i + 2);
+                // Dipecah per 1 file per dokumen agar ukuran di bawah 1MB dan anti-gagal di HP jadul
+                for (let i = 0; i < allCompressedFiles.length; i++) {
+                    const fileChunk = [allCompressedFiles[i]];
                     const reportPayload = {
                         uploader: currentUser.name,
                         division: currentUser.division,
@@ -973,7 +965,7 @@
 
             } catch (error) {
                 console.error("Gagal Upload:", error);
-                Swal.fire({ icon: 'error', title: 'Kesalahan', text: 'Terjadi kendala koneksi saat mengirim foto. Silakan coba lagi.', confirmButtonColor: '#2563eb' });
+                Swal.fire({ icon: 'error', title: 'Kesalahan', text: 'Terjadi kendala saat mengirim foto. Ukuran file terlalu besar atau memori perangkat penuh.', confirmButtonColor: '#2563eb' });
             } finally {
                 btnUpload.disabled = false;
                 btnUpload.innerHTML = `<i class="fa-solid fa-upload mr-1"></i> Kirim Laporan`;
@@ -1049,7 +1041,6 @@
             return Object.values(grouped);
         }
 
-        // Arsip User: Foto tidak ditampilkan untuk mempercepat proses & menjaga instan
         function renderUserArchiveView(filter = {}) {
             const archiveList = document.getElementById('user-archive-list');
             if (!archiveList) return;
