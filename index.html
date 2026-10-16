@@ -39,6 +39,11 @@
             </div>
             
             <div class="flex items-center space-x-4">
+                <!-- Tombol Refresh Browser -->
+                <button onclick="location.reload(true)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center shadow-sm" title="Refresh Halaman & Sinkronisasi Kode">
+                    <i class="fa-solid fa-rotate mr-1.5 text-blue-600"></i> Refresh
+                </button>
+
                 <!-- Indikator Kecepatan Jaringan -->
                 <div class="hidden sm:flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600">
                     <span id="network-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -159,7 +164,7 @@
                     </form>
                 </div>
 
-                <!-- Riwayat Arsip User -->
+                <!-- Riwayat Arsip User (Tanpa Menampilkan Foto agar Instan) -->
                 <div id="user-archive-container" class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
                         <h3 class="font-bold text-lg text-slate-900 flex items-center">
@@ -232,11 +237,26 @@
                         <i class="fa-solid fa-shield-halved text-blue-600 mr-2"></i> Panel Kontrol & Arsip Full Admin
                     </h3>
                     
-                    <!-- Filter Admin -->
+                    <!-- Filter Admin Lengkap (Tanggal, Divisi, dan Jenis Dokumentasi) -->
                     <div class="flex flex-wrap gap-3 items-center">
                         <div>
                             <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tanggal Laporan</label>
                             <input type="date" id="filter-date" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase">Divisi</label>
+                            <select id="filter-divisi" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                                <option value="">Semua Divisi</option>
+                                <option value="SECURITY">SECURITY</option>
+                                <option value="PERSIAPAN">PERSIAPAN</option>
+                                <option value="PENGOLAHAN">PENGOLAHAN</option>
+                                <option value="PEMORSIAN">PEMORSIAN</option>
+                                <option value="DISTRIBUSI">DISTRIBUSI</option>
+                                <option value="KEBERSIHAN">KEBERSIHAN</option>
+                                <option value="FOODTRAY">FOODTRAY</option>
+                                <option value="ASLAP">ASLAP</option>
+                                <option value="WAREHOUSE">WAREHOUSE</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-[10px] font-semibold text-slate-500 uppercase">Jenis Dokumentasi</label>
@@ -778,8 +798,9 @@
 
                 if (currentUser && currentUser.role === 'admin') {
                     const dateFilter = document.getElementById('filter-date').value;
+                    const divisiFilter = document.getElementById('filter-divisi').value;
                     const kategoriFilter = document.getElementById('filter-kategori').value;
-                    renderAdminArchiveView({ date: dateFilter, kategori: kategoriFilter });
+                    renderAdminArchiveView({ date: dateFilter, divisi: divisiFilter, kategori: kategoriFilter });
                 } else if (currentUser) {
                     const dateFilter = document.getElementById('user-filter-date').value;
                     const kategori = document.getElementById('user-filter-kategori').value;
@@ -788,7 +809,6 @@
             });
         }
 
-        // PERBAIKAN KOMPRESI LEBIH RINGAN (MAX 700PX & KUALITAS 0.45)
         async function applyWatermarkAndCompress(file, category, uploaderName) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -800,7 +820,7 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const maxWidth = 700; // Dikurangi agar ukuran Base64 sangat kecil & ringan
+                        const maxWidth = 700;
 
                         if (width > maxWidth) {
                             height = Math.round((height * maxWidth) / width);
@@ -828,7 +848,7 @@
                         ctx.fillStyle = "#38bdf8";
                         ctx.fillText(brandStr, 15, height - 16);
 
-                        resolve(canvas.toDataURL('image/jpeg', 0.45)); // Kompresi ringan anti error payload Firestore
+                        resolve(canvas.toDataURL('image/jpeg', 0.45));
                     };
                     img.src = event.target.result;
                 };
@@ -910,8 +930,6 @@
                 const uploadBatchGroupId = Date.now().toString();
                 const syncStartTime = Date.now();
 
-                // PERBAIKAN: Kirim foto satu per satu ke dokumen terpisah jika ukuran besar, atau simpan ringan
-                // Bagi foto jika lebih dari 2 foto untuk mencegah batas 1MB Firestore
                 for (let i = 0; i < allCompressedFiles.length; i += 2) {
                     const fileChunk = allCompressedFiles.slice(i, i + 2);
                     const reportPayload = {
@@ -933,7 +951,6 @@
                         createdAt: window.serverTimestamp()
                     });
 
-                    // Background sync ke Drive
                     syncToDriveInBackground(docRef.id, reportPayload, formattedDateFolder);
                 }
 
@@ -943,7 +960,6 @@
                 setTodayDate();
                 updateCategoryDropdownOptions();
 
-                // NOTIFIKASI SUKSES INSTAN
                 Swal.fire({
                     icon: 'success',
                     title: 'BERHASIL DIKIRIM!',
@@ -1033,6 +1049,7 @@
             return Object.values(grouped);
         }
 
+        // Arsip User: Foto tidak ditampilkan untuk mempercepat proses & menjaga instan
         function renderUserArchiveView(filter = {}) {
             const archiveList = document.getElementById('user-archive-list');
             if (!archiveList) return;
@@ -1051,19 +1068,13 @@
             const groupedData = groupReports(rawList);
             let html = "";
             groupedData.forEach(item => {
-                let photosHtml = `<div class="flex space-x-1 overflow-x-auto py-1">`;
-                item.files.forEach(f => {
-                    photosHtml += `<img src="${f.fileData}" onclick="openPhotoModal('${f.fileData}', '${f.fileName}')" class="w-12 h-12 object-cover rounded-lg border cursor-pointer hover:scale-105">`;
-                });
-                photosHtml += `</div>`;
-
                 html += `
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 space-y-2 shadow-sm">
-                        <div class="flex justify-between items-start">
-                            <span class="text-xs font-bold uppercase text-blue-700 bg-blue-50 px-2 py-0.5 rounded-lg">${item.kategori}</span>
-                            <span class="text-[10px] text-slate-500">${item.tanggal}</span>
+                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 space-y-2 shadow-sm flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-bold uppercase text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg">${item.kategori}</span>
+                            <p class="text-[11px] text-slate-500 mt-1"><i class="fa-solid fa-calendar-day mr-1"></i> Tanggal: ${item.tanggal} | <span class="font-medium text-emerald-600">${item.files.length} Foto Terkirim</span></p>
                         </div>
-                        ${photosHtml}
+                        <span class="text-xs bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full font-medium">Berhasil</span>
                     </div>
                 `;
             });
@@ -1091,6 +1102,7 @@
             allGlobalReports.forEach(data => {
                 const itemDatePart = data.tanggal ? (data.tanggal.includes('T') ? data.tanggal.split('T')[0] : data.tanggal) : '';
                 if (filter.date && itemDatePart !== filter.date) return;
+                if (filter.divisi && data.division !== filter.divisi) return;
                 if (filter.kategori && data.kategori !== filter.kategori) return;
                 rawList.push(data);
             });
@@ -1165,12 +1177,17 @@
         }
 
         function applyAdminFilter() {
-            renderAdminArchiveView({ date: document.getElementById('filter-date').value, kategori: document.getElementById('filter-kategori').value });
+            renderAdminArchiveView({ 
+                date: document.getElementById('filter-date').value, 
+                divisi: document.getElementById('filter-divisi').value, 
+                kategori: document.getElementById('filter-kategori').value 
+            });
         }
 
         function resetAdminFilter() {
             const todayStr = new Date().toISOString().split('T')[0];
             document.getElementById('filter-date').value = todayStr;
+            document.getElementById('filter-divisi').value = '';
             document.getElementById('filter-kategori').value = '';
             renderAdminArchiveView({ date: todayStr });
         }
