@@ -865,7 +865,6 @@
                         ctx.drawImage(img, 0, 0, width, height);
                         var compressed = canvas.toDataURL("image/jpeg", quality);
 
-                        // Bersihkan buffer canvas & img agar RAM HP cepat lega
                         ctx.clearRect(0, 0, width, height);
                         canvas.width = 0;
                         canvas.height = 0;
@@ -1064,7 +1063,6 @@
                 return;
             }
 
-            // Reset form segera dan tampilkan BERHASIL tanpa mengunci tombol
             var uploadFormEl = document.getElementById("upload-form");
             if (uploadFormEl) uploadFormEl.reset();
             document.getElementById("input-instansi").value = "SPPG KOTA SERANG SERANG SERANG 2";
@@ -1166,6 +1164,24 @@
             } catch (e) {}
         }
 
+        // Deduplikasi foto di dalam satu dokumen agar foto tidak pernah berlipat
+        function sanitizeUniqueFiles(filesArr) {
+            if (!filesArr || !filesArr.length) return [];
+            var seenNames = {};
+            var uniqueList = [];
+            for (var i = 0; i < filesArr.length; i++) {
+                var f = filesArr[i];
+                if (!f || !f.fileData) continue;
+                var key = f.fileName ? String(f.fileName) : ("img_" + i);
+                if (!seenNames[key]) {
+                    seenNames[key] = true;
+                    uniqueList.push(f);
+                }
+            }
+            return uniqueList;
+        }
+
+        // Kelompokkan hanya batch yang berasal dari upload yang sama (batchGroupId)
         function groupReports(docsList) {
             var grouped = {};
             var orderKeys = [];
@@ -1173,14 +1189,10 @@
             for (var i = 0; i < docsList.length; i++) {
                 var item = docsList[i];
                 var rawDatePart = item.tanggal ? (item.tanggal.indexOf("T") > -1 ? item.tanggal.split("T")[0] : item.tanggal) : "no-date";
-                var isSynced = item.syncedToDrive === true;
-                var isFailed = item.syncFailed === true;
-                var statusTag = isSynced ? "synced" : (isFailed ? "failed" : "pending");
-                var batchKey = isSynced
-                    ? "synced_combined"
-                    : (item.batchGroupId || item.syncStartTime || (item.createdAt && item.createdAt.seconds ? item.createdAt.seconds : "single"));
+                var batchKey = item.batchGroupId || item.id;
+                var key = rawDatePart + "_" + (item.uploader || "") + "_" + (item.instansi || "") + "_" + (item.kategori || "") + "_" + batchKey;
 
-                var key = rawDatePart + "_" + (item.uploader || "") + "_" + (item.instansi || "") + "_" + (item.kategori || "") + "_" + statusTag + "_" + batchKey;
+                var itemFiles = sanitizeUniqueFiles(item.files);
 
                 if (!grouped[key]) {
                     orderKeys.push(key);
@@ -1192,14 +1204,23 @@
                         tanggal: rawDatePart,
                         createdAt: item.createdAt,
                         syncStartTime: item.syncStartTime,
-                        files: item.files ? item.files.slice(0) : [],
+                        files: itemFiles,
                         syncedToDrive: item.syncedToDrive === true,
                         syncFailed: item.syncFailed === true
                     };
                 } else {
                     grouped[key].docIds.push(item.id);
-                    if (item.files && item.files.length > 0) {
-                        grouped[key].files = grouped[key].files.concat(item.files);
+                    var existingNames = {};
+                    for (var e = 0; e < grouped[key].files.length; e++) {
+                        var exName = grouped[key].files[e].fileName || ("ex_" + e);
+                        existingNames[exName] = true;
+                    }
+                    for (var n = 0; n < itemFiles.length; n++) {
+                        var nName = itemFiles[n].fileName || ("new_" + n);
+                        if (!existingNames[nName]) {
+                            existingNames[nName] = true;
+                            grouped[key].files.push(itemFiles[n]);
+                        }
                     }
                     if (!item.syncedToDrive) {
                         grouped[key].syncedToDrive = false;
