@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <title>Dokumentasi Operasional</title>
   <style>
     /* Reset & Base Styles - Ringan tanpa animasi berat untuk HP RAM 1GB+ */
@@ -81,6 +84,18 @@
       background-color: #fee2e2;
       color: #991b1b;
       border: 1px solid #fca5a5;
+    }
+
+    .badge-cache {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      background-color: #e0e7ff;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+      margin-left: 4px;
     }
 
     .queue-summary {
@@ -469,6 +484,7 @@
   <div class="status-bar">
     <div class="status-left">
       <span id="netBadge" class="badge badge-online">ONLINE</span>
+      <span id="offlineReadyBadge" class="badge-cache" style="display:none;">MODE OFFLINE SIAP</span>
       <span id="queueSummary" class="queue-summary">Menunggu: 0 | Terkirim: 0 | Gagal: 0</span>
     </div>
     <div class="status-right">
@@ -557,8 +573,10 @@
 
   <script>
     /**
-     * APLIKASI DOKUMENTASI FOTO OFFLINE-FIRST (ES5, SINGLE-FILE, ANTI GAGAL)
-     * Kompatibel Android 1 - terbaru, RAM 1GB+, dan WebView pratinjau.
+     * APLIKASI DOKUMENTASI FOTO FULL OFFLINE-FIRST (ES5, SINGLE-FILE, ANTI GAGAL)
+     * - Dapat dibuka tanpa koneksi internet (Service Worker Cache Storage + Local Shell)
+     * - Kompatibel Android 1 - terbaru, RAM 1GB+, dan WebView pratinjau.
+     * - Otomatis mengirim antrean foto di latar belakang saat koneksi online kembali.
      */
     (function() {
       'use strict';
@@ -590,8 +608,85 @@
       var dbInstance = null;
       var storageMode = 'memory'; // 'indexeddb' | 'localstorage' | 'memory'
       var LS_KEY = 'dok_foto_queue_v2';
+      var SHELL_CACHE_NAME = 'dok-foto-shell-v1';
+      var SHELL_LS_KEY = 'dok_foto_app_shell_html_v1';
       var memoryQueue = [];
       var memorySeq = 1;
+
+      // =====================================================================
+      // OFFLINE APP SHELL CACHE (AGAR HALAMAN BISA DIBUKA TANPA INTERNET)
+      // =====================================================================
+      function markOfflineShellReady() {
+        var badge = document.getElementById('offlineReadyBadge');
+        if (badge) {
+          badge.style.display = 'inline-block';
+        }
+      }
+
+      function initOfflineAppShell() {
+        var pageUrl = window.location.href.split('#')[0];
+        var protocol = window.location.protocol;
+
+        // Jika dibuka langsung dari penyimpanan lokal HP (file://), sistem otomatis bisa dibuka offline
+        if (protocol === 'file:') {
+          markOfflineShellReady();
+          return;
+        }
+
+        // 1. Simpan snapshot HTML ke localStorage sebagai cadangan tambahan
+        try {
+          if (document.documentElement && document.documentElement.outerHTML) {
+            localStorage.setItem(SHELL_LS_KEY, '<!DOCTYPE html>\n' + document.documentElement.outerHTML);
+          }
+        } catch (eLsShell) {}
+
+        // 2. Simpan halaman ke Cache Storage & daftarkan Service Worker dinamis (jika HTTPS / localhost)
+        if ('caches' in window && (protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+          try {
+            var fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            caches.open(SHELL_CACHE_NAME).then(function(cache) {
+              var resp = new Response(fullHtml, {
+                status: 200,
+                statusText: 'OK',
+                headers: { 'Content-Type': 'text/html; charset=utf-8' }
+              });
+              return cache.put(pageUrl, resp);
+            }).then(function() {
+              markOfflineShellReady();
+            }).catch(function() {});
+          } catch (eCache) {}
+
+          if ('serviceWorker' in navigator && typeof Blob !== 'undefined' && window.URL && window.URL.createObjectURL) {
+            try {
+              var swCode =
+                "var CACHE_NAME='" + SHELL_CACHE_NAME + "';" +
+                "self.addEventListener('install',function(e){self.skipWaiting();});" +
+                "self.addEventListener('activate',function(e){e.waitUntil(self.clients.claim());});" +
+                "self.addEventListener('fetch',function(e){" +
+                "  if(e.request.method!=='GET')return;" +
+                "  if(e.request.mode==='navigate'||(e.request.headers.get('accept')||'').indexOf('text/html')!==-1){" +
+                "    e.respondWith(" +
+                "      fetch(e.request).then(function(res){" +
+                "        var copy=res.clone();" +
+                "        caches.open(CACHE_NAME).then(function(c){c.put(e.request,copy);});" +
+                "        return res;" +
+                "      }).catch(function(){" +
+                "        return caches.match(e.request,{ignoreSearch:true}).then(function(cached){" +
+                "          return cached||caches.match('" + pageUrl.replace(/'/g, "\\'") + "');" +
+                "        });" +
+                "      })" +
+                "    );" +
+                "  }" +
+                "});";
+              var swBlob = new Blob([swCode], { type: 'application/javascript' });
+              var swUrl = window.URL.createObjectURL(swBlob);
+              navigator.serviceWorker.register(swUrl).then(function() {
+                markOfflineShellReady();
+              }).catch(function() {});
+            } catch (eSw) {}
+          }
+        }
+      }
 
       // =====================================================================
       // UTILITAS UI & FORMAT
@@ -719,7 +814,6 @@
         try {
           inputEl.value = '';
         } catch (err) {
-          // Fallback untuk WebView lama jika input.value = '' diblokir
           var parent = inputEl.parentNode;
           if (parent) {
             var newInput = document.createElement('input');
@@ -797,7 +891,6 @@
         }
 
         processPhotoWithFallbacks(file, function(errReason, resultDataUrl) {
-          // Selalu reset input file agar file yang sama bisa dipilih ulang kapan saja
           resetFileInputElement(idx);
 
           if (errReason || !resultDataUrl) {
@@ -817,11 +910,6 @@
         });
       }
 
-      /**
-       * Membaca File/Blob dengan fallback berlapis:
-       * 1) FileReader.readAsDataURL(file)
-       * 2) URL.createObjectURL / webkitURL.createObjectURL
-       */
       function readFileAsImageSource(file, callback) {
         var settled = false;
         function done(err, srcUrl, isObjectUrl) {
@@ -875,9 +963,6 @@
         tryObjectUrl('FileReader tidak tersedia');
       }
 
-      /**
-       * Menggambar gambar ke canvas dengan batas ukuran tertentu & fallback toDataURL
-       */
       function renderImageToCompressedDataUrl(img, maxDim, quality) {
         var natW = img.naturalWidth || img.width || 0;
         var natH = img.naturalHeight || img.height || 0;
@@ -918,7 +1003,6 @@
         try {
           dataUrl = canvas.toDataURL('image/jpeg', quality);
         } catch (eToDataUrl) {
-          // Fallback toDataURL tanpa parameter kualitas (beberapa WebView lama)
           try {
             dataUrl = canvas.toDataURL('image/jpeg');
           } catch (eFallbackType) {
@@ -926,7 +1010,6 @@
           }
         }
 
-        // Bersihkan memori canvas secara eksplisit untuk HP RAM 1GB
         try {
           ctx.clearRect(0, 0, targetW, targetH);
           canvas.width = 1;
@@ -942,9 +1025,6 @@
         return dataUrl;
       }
 
-      /**
-       * Proses lengkap foto dengan fallback berlapis & decode aman
-       */
       function processPhotoWithFallbacks(file, callback) {
         readFileAsImageSource(file, function(readErr, srcUrl, isObjectUrl) {
           var URLObj = (typeof window !== 'undefined') ? (window.URL || window.webkitURL) : null;
@@ -982,19 +1062,16 @@
           }
 
           function runCompressionStages() {
-            // Tahap 1: Kompresi utama 960px, kualitas 0.68
             try {
               var out1 = renderImageToCompressedDataUrl(img, PRIMARY_MAX_DIM, JPEG_QUALITY);
               finishWith(null, out1);
               return;
             } catch (eStage1) {
-              // Tahap 2: Kompresi lebih hemat memori 800px, kualitas 0.68
               try {
                 var out2 = renderImageToCompressedDataUrl(img, FALLBACK_MAX_DIM, JPEG_QUALITY);
                 finishWith(null, out2);
                 return;
               } catch (eStage2) {
-                // Tahap 3: Fallback data mentah jika sumber sudah berupa data:image dan ukuran wajar
                 if (!isObjectUrl && typeof srcUrl === 'string' && srcUrl.indexOf('data:image') === 0) {
                   var approxBytes = Math.round((srcUrl.length * 3) / 4);
                   if (approxBytes <= MAX_RAW_FALLBACK_BYTES) {
@@ -1013,7 +1090,6 @@
                 img.decode().then(function() {
                   runCompressionStages();
                 }, function() {
-                  // Jika decode() reject pada WebView tertentu, tetap lanjutkan ke kompresi
                   runCompressionStages();
                 });
                 return;
@@ -1112,7 +1188,6 @@
               if (callback) callback(null);
             };
             tx.onerror = function() {
-              // Fallback ke localStorage/memory bila IndexedDB gagal menulis
               for (var k = 0; k < newItems.length; k++) {
                 newItems[k].id = 'mem_' + (memorySeq++) + '_' + Date.now();
                 memoryQueue.push(newItems[k]);
@@ -1282,7 +1357,6 @@
               panelEl.textContent = 'Belum ada antrean foto.';
             } else {
               panelEl.className = '';
-              // Tampilkan maksimal 15 item terbaru agar DOM tetap ringan di HP RAM 1GB
               var startIdx = list.length > 15 ? list.length - 15 : 0;
               var html = '<ul class="queue-list">';
               for (var j = list.length - 1; j >= startIdx; j--) {
@@ -1370,10 +1444,12 @@
             return;
           }
 
-          // Respon sukses instan tanpa menunggu jaringan
-          showToast('Tersimpan & dikirim di latar belakang (' + totalBatch + ' foto)', 'toast-success');
+          if (isOnlineNow()) {
+            showToast('Tersimpan & dikirim di latar belakang (' + totalBatch + ' foto)', 'toast-success');
+          } else {
+            showToast('Tersimpan di HP (' + totalBatch + ' foto). Otomatis terkirim saat internet aktif.', 'toast-info');
+          }
 
-          // Reset form untuk input berikutnya
           resetAllSlots();
           if (ketEl) {
             ketEl.value = '';
@@ -1405,7 +1481,6 @@
         try {
           return new Blob([ab], { type: mime });
         } catch (eBlob) {
-          // Fallback BlobBuilder untuk Android sangat lama
           var BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
           if (BlobBuilder) {
             var bb = new BlobBuilder();
@@ -1474,9 +1549,6 @@
         }
       }
 
-      /**
-       * Mengirim batch >= 2 foto via sendMediaGroup dengan fallback otomatis ke sendPhoto per item
-       */
       function sendBatchMediaGroupOrFallback(batchItems, onAllDone) {
         if (batchItems.length < 2 || typeof FormData === 'undefined') {
           var idxSingle = 0;
@@ -1558,7 +1630,6 @@
                 }
                 markSent();
               } else {
-                // Fallback ke sendPhoto satu per satu jika sendMediaGroup ditolak/gagal
                 var fIdx = 0;
                 function fallbackSingle() {
                   if (fIdx >= batchItems.length) {
@@ -1654,7 +1725,6 @@
 
           isSyncing = true;
 
-          // Kelompokkan item pending berdasarkan batchId agar bisa dikirim sebagai album bila >= 2 foto
           var firstItem = pendingList[0];
           var sameBatch = [];
           for (var j = 0; j < pendingList.length; j++) {
@@ -1679,6 +1749,7 @@
       // =====================================================================
       window.addEventListener('online', function() {
         updateNetworkBadge();
+        showToast('Internet terhubung! Mengirim antrean foto di latar belakang...', 'toast-info');
         triggerBackgroundSync();
       });
 
@@ -1687,11 +1758,19 @@
         refreshQueueUI();
       });
 
+      // Cek otomatis saat aplikasi kembali dibuka / layar menyala
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && isOnlineNow()) {
+          triggerBackgroundSync();
+        }
+      });
+
       setInterval(function() {
         triggerBackgroundSync();
       }, 15000);
 
       function bootstrap() {
+        initOfflineAppShell();
         updateNetworkBadge();
         initCategories();
         initSlots();
