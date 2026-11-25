@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dokumentasi Operasional</title>
   <style>
     /* Reset & Base Styles - Ringan tanpa animasi berat untuk HP RAM 1GB+ */
@@ -674,22 +674,26 @@
       }
 
       // =====================================================================
-      // 10 KOLOM UPLOAD FOTO & RESET INPUT FILE
+      // 10 KOLOM UPLOAD FOTO & RESET INPUT FILE (KAMERA ATAU GALERI)
       // =====================================================================
+      function buildSlotEmptyHtml(idx) {
+        var num = idx + 1;
+        return '<label class="slot-trigger" for="fileInput_' + idx + '" id="slotTrigger_' + idx + '">' +
+                 '<span class="slot-number">Foto ' + num + '</span>' +
+                 '<span class="slot-icon">+</span>' +
+                 '<span class="slot-hint">Kamera / Galeri</span>' +
+               '</label>' +
+               '<input type="file" accept="image/*" class="slot-input" id="fileInput_' + idx + '" data-index="' + idx + '">';
+      }
+
       function initSlots() {
         var grid = document.getElementById('slotsGrid');
         if (!grid) return;
         var html = '';
         for (var i = 0; i < TOTAL_SLOTS; i++) {
-          var num = i + 1;
           html += '<div class="slot-wrapper">' +
                     '<div class="slot-box" id="slotBox_' + i + '">' +
-                      '<label class="slot-trigger" for="fileInput_' + i + '" id="slotTrigger_' + i + '">' +
-                        '<span class="slot-number">Foto ' + num + '</span>' +
-                        '<span class="slot-icon">+</span>' +
-                        '<span class="slot-hint">Kamera / Galeri</span>' +
-                      '</label>' +
-                      '<input type="file" accept="image/*" capture="environment" class="slot-input" id="fileInput_' + i + '" data-index="' + i + '">' +
+                      buildSlotEmptyHtml(i) +
                     '</div>' +
                   '</div>';
         }
@@ -721,7 +725,6 @@
             var newInput = document.createElement('input');
             newInput.type = 'file';
             newInput.accept = 'image/*';
-            newInput.capture = 'environment';
             newInput.className = 'slot-input';
             newInput.id = 'fileInput_' + idx;
             newInput.setAttribute('data-index', String(idx));
@@ -756,14 +759,8 @@
         slotPhotos[idx] = null;
         var box = document.getElementById('slotBox_' + idx);
         if (!box) return;
-        var num = idx + 1;
         box.className = 'slot-box';
-        box.innerHTML = '<label class="slot-trigger" for="fileInput_' + idx + '" id="slotTrigger_' + idx + '">' +
-                          '<span class="slot-number">Foto ' + num + '</span>' +
-                          '<span class="slot-icon">+</span>' +
-                          '<span class="slot-hint">Kamera / Galeri</span>' +
-                        '</label>' +
-                        '<input type="file" accept="image/*" capture="environment" class="slot-input" id="fileInput_' + idx + '" data-index="' + idx + '">';
+        box.innerHTML = buildSlotEmptyHtml(idx);
         bindSlotInput(idx);
         resetFileInputElement(idx);
         updateSubmitButton();
@@ -961,7 +958,6 @@
           }
 
           if (readErr || !srcUrl) {
-            // Fallback terakhir: jika file berupa dataURL/string atau ukuran wajar, coba baca mentah
             callback(readErr || 'Gagal membaca file', null);
             return;
           }
