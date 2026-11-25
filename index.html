@@ -1,1870 +1,1765 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Sistem Laporan Dokumentasi Kerja</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome untuk Icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SweetAlert2 untuk Notifikasi Profesional -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2563eb',
-                        secondary: '#1e40af',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* Mode hemat memori & animasi ringan untuk perangkat RAM rendah / Android lama */
-        .low-spec-mode *,
-        .low-spec-mode *::before,
-        .low-spec-mode *::after {
-            animation: none !important;
-            transition: none !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dokumentasi Operasional</title>
+  <style>
+    /* Reset & Base Styles - Ringan tanpa animasi berat untuk HP RAM 1GB+ */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        /* Paksa mode desktop muat penuh tanpa geser & tanpa zoom khusus Riwayat Laporan, Panel Kontrol & Arsip Full Admin */
-        .desktop-fit-outer {
-            width: 100%;
-            overflow: hidden;
-            position: relative;
-        }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f1f5f9;
+      color: #1e293b;
+      font-size: 15px;
+      line-height: 1.4;
+      padding-bottom: 92px;
+    }
 
-        .desktop-fit-inner {
-            width: 100%;
-            overflow: hidden;
-            position: relative;
-        }
+    /* Header */
+    .header {
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 14px 16px;
+      border-bottom: 3px solid #2563eb;
+    }
 
-        .desktop-fit-canvas {
-            width: 1120px;
-            min-width: 1120px;
-            transform-origin: top left;
-            -webkit-transform-origin: top left;
-        }
-    </style>
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .header p {
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      background-color: #ffffff;
+      border-bottom: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      font-size: 13px;
+      display: table;
+      width: 100%;
+    }
+
+    .status-left {
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    .status-right {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: right;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-online {
+      background-color: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .badge-offline {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .queue-summary {
+      display: block;
+      margin-top: 4px;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .btn-sync-small {
+      background-color: #e2e8f0;
+      color: #0f172a;
+      border: 1px solid #94a3b8;
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-sync-small:active {
+      background-color: #cbd5e1;
+    }
+
+    /* Container */
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    /* Card */
+    .card {
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    /* Kategori Radio */
+    .category-list {
+      list-style: none;
+    }
+
+    .category-item {
+      margin-bottom: 8px;
+    }
+
+    .category-label {
+      display: block;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 11px 12px;
+      background-color: #f8fafc;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      color: #1e293b;
+    }
+
+    .category-label.selected {
+      border-color: #2563eb;
+      background-color: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .category-radio {
+      margin-right: 8px;
+      transform: scale(1.2);
+      vertical-align: middle;
+    }
+
+    /* Input Keterangan */
+    .input-group {
+      margin-top: 12px;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #334155;
+    }
+
+    .text-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #94a3b8;
+      border-radius: 6px;
+      font-size: 14px;
+      background-color: #ffffff;
+      color: #0f172a;
+    }
+
+    .text-input:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    /* 10 Kolom Foto */
+    .slots-grid {
+      font-size: 0;
+      margin: 0 -4px;
+    }
+
+    .slot-wrapper {
+      display: inline-block;
+      vertical-align: top;
+      width: 50%;
+      padding: 4px;
+      font-size: 13px;
+    }
+
+    @media (min-width: 480px) {
+      .slot-wrapper {
+        width: 33.333%;
+      }
+    }
+
+    .slot-box {
+      border: 2px dashed #94a3b8;
+      border-radius: 8px;
+      background-color: #f8fafc;
+      height: 148px;
+      position: relative;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .slot-box.has-photo {
+      border-style: solid;
+      border-color: #16a34a;
+      background-color: #0f172a;
+    }
+
+    .slot-box.processing {
+      border-color: #f59e0b;
+      background-color: #fef3c7;
+    }
+
+    .slot-trigger {
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding-top: 28px;
+      cursor: pointer;
+      color: #475569;
+    }
+
+    .slot-number {
+      display: inline-block;
+      background-color: #e2e8f0;
+      color: #0f172a;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+
+    .slot-icon {
+      display: block;
+      font-size: 24px;
+      line-height: 1;
+      margin-bottom: 4px;
+      color: #2563eb;
+      font-weight: bold;
+    }
+
+    .slot-hint {
+      font-size: 11px;
+      display: block;
+      padding: 0 4px;
+    }
+
+    .slot-input {
+      display: none;
+    }
+
+    .slot-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .slot-badge-top {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      background-color: rgba(15, 23, 42, 0.82);
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .slot-remove-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background-color: #dc2626;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 28px;
+      text-align: center;
+    }
+
+    /* Panel Status Antrean Sinkronisasi */
+    .queue-list {
+      list-style: none;
+      margin-top: 8px;
+    }
+
+    .queue-item {
+      border: 1px solid #e2e8f0;
+      background-color: #f8fafc;
+      border-radius: 6px;
+      padding: 9px 10px;
+      margin-bottom: 7px;
+      font-size: 12px;
+    }
+
+    .queue-item-top {
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+
+    .queue-item-meta {
+      color: #475569;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .q-status-pending {
+      color: #b45309;
+      font-weight: 700;
+    }
+
+    .q-status-sent {
+      color: #15803d;
+      font-weight: 700;
+    }
+
+    .q-status-failed {
+      color: #b91c1c;
+      font-weight: 700;
+    }
+
+    .queue-actions {
+      margin-top: 8px;
+      text-align: right;
+    }
+
+    .btn-retry {
+      background-color: #2563eb;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 6px;
+    }
+
+    .btn-clear-sent {
+      background-color: #e2e8f0;
+      color: #1e293b;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .empty-queue-msg {
+      font-size: 12px;
+      color: #64748b;
+      padding: 6px 0;
+    }
+
+    /* Fixed Bottom Bar */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #ffffff;
+      border-top: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      z-index: 50;
+    }
+
+    .bottom-inner {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: #16a34a;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn-submit:active {
+      background-color: #15803d;
+    }
+
+    /* Toast Notification (Pengganti alert) */
+    .toast-box {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      max-width: 616px;
+      margin: 0 auto;
+      padding: 13px 15px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 100;
+      display: none;
+      border: 2px solid transparent;
+    }
+
+    .toast-success {
+      background-color: #166534;
+      color: #ffffff;
+      border-color: #86efac;
+    }
+
+    .toast-error {
+      background-color: #991b1b;
+      color: #ffffff;
+      border-color: #fca5a5;
+    }
+
+    .toast-info {
+      background-color: #1e40af;
+      color: #ffffff;
+      border-color: #93c5fd;
+    }
+  </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+<body>
 
-    <!-- HALAMAN KHUSUS PERINGATAN JARINGAN LELET -->
-    <section id="slow-network-page" class="fixed inset-0 z-[9999] bg-slate-900/95 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl border border-rose-200 p-6 sm:p-8 text-center space-y-5">
-            <div class="w-20 h-20 mx-auto rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-4xl">
-                <i class="fa-solid fa-wifi"></i>
-            </div>
+  <!-- Notifikasi Instan -->
+  <div id="toastBox" class="toast-box" role="alert"></div>
 
-            <div class="space-y-2">
-                <span class="inline-block bg-rose-100 text-rose-700 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
-                    Peringatan Koneksi
-                </span>
-                <h2 class="text-2xl font-bold text-slate-900">Jaringan Anda Lelet</h2>
-                <p id="slow-network-detail" class="text-sm text-slate-600 leading-relaxed">
-                    Koneksi internet terdeteksi lambat atau tidak stabil. Daripada memaksa upload foto yang berisiko gagal terkirim atau menggantung, silakan perbaiki jaringan terlebih dahulu.
-                </p>
-            </div>
+  <!-- Header -->
+  <div class="header">
+    <h1>Dokumentasi Foto Operasional Dapur</h1>
+    <p>SPPG KOTA SERANG &bull; SERANG SERANG 2</p>
+  </div>
 
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-left text-xs text-amber-800 space-y-1.5">
-                <div class="font-bold flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-info text-amber-600"></i>
-                    <span>Saran Agar Foto Lancar Terkirim:</span>
-                </div>
-                <p>1. Pindah ke area dengan sinyal lebih kuat atau dekat router Wi-Fi.</p>
-                <p>2. Matikan/nyalakan Mode Pesawat sebentar untuk menyegarkan jaringan.</p>
-                <p>3. Hindari mengirim banyak foto sekaligus saat jaringan masih lelet.</p>
-            </div>
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-left">
+      <span id="netBadge" class="badge badge-online">ONLINE</span>
+      <span id="queueSummary" class="queue-summary">Menunggu: 0 | Terkirim: 0 | Gagal: 0</span>
+    </div>
+    <div class="status-right">
+      <button type="button" id="btnManualSync" class="btn-sync-small">Sinkronkan</button>
+    </div>
+  </div>
 
-            <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
-                <button type="button" onclick="recheckNetworkNow(true)" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition">
-                    <i class="fa-solid fa-rotate-right mr-1.5"></i> Cek Ulang Jaringan
-                </button>
-                <button type="button" onclick="hideSlowNetworkPage()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-sm transition">
-                    Kembali ke Halaman
-                </button>
-            </div>
-        </div>
-    </section>
+  <div class="container">
+    <!-- 1. Kategori Dokumentasi -->
+    <div class="card">
+      <div class="section-title">1. Pilih Kategori Dokumentasi</div>
+      <ul class="category-list" id="categoryList">
+        <li class="category-item">
+          <label class="category-label selected" data-val="1. Absensi">
+            <input type="radio" name="kategori" value="1. Absensi" class="category-radio" checked>
+            1. Absensi
+          </label>
+        </li>
+        <li class="category-item">
+          <label class="category-label" data-val="2. Area depan dapur/parkiran">
+            <input type="radio" name="kategori" value="2. Area depan dapur/parkiran" class="category-radio">
+            2. Area depan dapur/parkiran
+          </label>
+        </li>
+        <li class="category-item">
+          <label class="category-label" data-val="3. Bahan baku datang">
+            <input type="radio" name="kategori" value="3. Bahan baku datang" class="category-radio">
+            3. Bahan baku datang
+          </label>
+        </li>
+        <li class="category-item">
+          <label class="category-label" data-val="4. Limbah B3 (jika ada)">
+            <input type="radio" name="kategori" value="4. Limbah B3 (jika ada)" class="category-radio">
+            4. Limbah B3 (jika ada)
+          </label>
+        </li>
+        <li class="category-item">
+          <label class="category-label" data-val="5. Saat pengambilan Sampah/Limbah">
+            <input type="radio" name="kategori" value="5. Saat pengambilan Sampah/Limbah" class="category-radio">
+            5. Saat pengambilan Sampah/Limbah
+          </label>
+        </li>
+        <li class="category-item">
+          <label class="category-label" data-val="6. Isi tabung Gas">
+            <input type="radio" name="kategori" value="6. Isi tabung Gas" class="category-radio">
+            6. Isi tabung Gas
+          </label>
+        </li>
+        <li class="category-item">
+          <label class="category-label" data-val="7. Isi Galon">
+            <input type="radio" name="kategori" value="7. Isi Galon" class="category-radio">
+            7. Isi Galon
+          </label>
+        </li>
+      </ul>
 
-    <!-- HEADER / NAVBAR -->
-    <header id="header-nav" class="bg-white shadow-sm hidden sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                    <i class="fa-solid fa-camera-retro"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg text-slate-900 leading-tight">Dokumentasi Kerja</h1>
-                    <p class="text-xs text-slate-500" id="user-role-badge">Sistem Pelaporan Mandiri</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-4">
-                <!-- Indikator Kecepatan Jaringan -->
-                <div onclick="recheckNetworkNow(true)" title="Klik untuk cek kecepatan jaringan" class="cursor-pointer hidden sm:flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600">
-                    <span id="network-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                    <span id="network-status">Memeriksa Jaringan...</span>
-                </div>
-                
-                <div class="flex items-center space-x-2 border-l pl-4 border-slate-200">
-                    <span id="display-username" class="font-semibold text-sm text-slate-700"></span>
-                    <button onclick="logout()" class="bg-rose-50 text-rose-600 hover:bg-rose-100 px-3 py-1.5 rounded-lg text-sm font-medium transition">
-                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- MAIN CONTAINER -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
-
-        <!-- KELOMPOK 1: HALAMAN LOGIN -->
-        <section id="login-section" class="max-w-md mx-auto mt-10 bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
-            <div class="text-center mb-6">
-                <img src="logo.png" alt="logo" class="w-20 h-20 mx-auto mb-3 object-contain" onerror="this.style.display='none'">
-                <h2 class="text-2xl font-bold text-slate-900">Selamat Datang</h2>
-                <p class="text-sm text-slate-500 mt-1">Silakan masuk menggunakan akun Anda</p>
-            </div>
-
-            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Username</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                            <i class="fa-solid fa-user"></i>
-                        </span>
-                        <input type="text" id="login-username" required placeholder="Username" 
-                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Password</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                            <i class="fa-solid fa-lock"></i>
-                        </span>
-                        <input type="password" id="login-password" required placeholder="Masukkan password" 
-                            class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
-                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-                            <i id="eye-icon" class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="login-error" class="hidden text-xs text-rose-600 bg-rose-50 p-2.5 rounded-lg text-center font-medium"></div>
-
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition shadow-lg shadow-blue-500/25">
-                    Masuk ke Sistem
-                </button>
-            </form>
-        </section>
-
-        <!-- KELOMPOK 2: DASHBOARD USER & ADMIN -->
-        <section id="dashboard-section" class="hidden space-y-6">
-            <!-- Welcome Banner -->
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h2 id="welcome-message" class="text-2xl font-bold">Selamat Datang</h2>
-                    <p class="text-blue-100 text-sm mt-1">Sistem Pengunggahan & Arsip Dokumentasi Kerja Harian</p>
-                </div>
-                <div class="bg-white/10 px-4 py-2 rounded-xl text-xs font-medium border border-white/20">
-                    <span id="current-date-label"></span>
-                </div>
-            </div>
-
-            <!-- SPANDUK PERINGATAN UPLOAD -->
-            <div id="upload-reminder-banner" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-xl shadow-sm hidden">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl mt-0.5"></i>
-                    </div>
-                    <div class="ml-3 w-full">
-                        <h3 class="text-sm font-bold text-amber-800">PERINGATAN DOKUMENTASI YANG BELUM DILAPORKAN!</h3>
-                        <p id="reminder-text" class="text-xs text-amber-700 mt-1 leading-relaxed">
-                            Mohon periksa dan unggah foto dokumentasi yang masih belum diunggah untuk hari ini.
-                        </p>
-                        <div id="missing-categories-tags" class="mt-2 flex flex-wrap gap-1.5">
-                            <!-- Tag kategori yang belum diupload dimasukkan via Javascript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB CONTAINER UNTUK USER & ADMIN -->
-            <div id="user-panel" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Form Upload User / Admin -->
-                <div id="upload-form-container" class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 class="font-bold text-lg text-slate-900 mb-2 flex items-center">
-                        <i class="fa-solid fa-cloud-arrow-up text-blue-600 mr-2"></i> Upload Dokumentasi
-                    </h3>
-                    <p id="device-profile-info" class="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 mb-4">
-                        Mode Kompresi Otomatis Aktif
-                    </p>
-                    <form id="upload-form" onsubmit="handleUpload(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Tanggal Laporan</label>
-                            <input type="date" id="input-tanggal-laporan" required onchange="updateCategoryDropdownOptions()"
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Instansi / Unit Kerja</label>
-                            <input type="text" id="input-instansi" value="SPPG KOTA SERANG SERANG SERANG 2" readonly required
-                                class="w-full px-3 py-2 bg-slate-100 text-slate-600 border border-slate-200 rounded-xl text-sm focus:outline-none cursor-not-allowed">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Jenis Foto Dokumentasi</label>
-                            <select id="input-kategori" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none">
-                                <option value="">-- Pilih Jenis Dokumentasi --</option>
-                            </select>
-                        </div>
-
-                        <!-- Bagian Khusus Kolom Upload Foto (Dinamis per User) -->
-                        <div id="dynamic-upload-container" class="space-y-3">
-                            <!-- Diisi secara dinamis via JS berdasarkan user yang login -->
-                        </div>
-
-                        <button type="submit" id="btn-upload" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition shadow-md disabled:bg-slate-300 disabled:cursor-not-allowed">
-                            <i class="fa-solid fa-upload mr-1"></i> Upload Laporan
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Riwayat Arsip User (DIPAKSA MODE DESKTOP PENUH TANPA GESER & TANPA ZOOM) -->
-                <div id="user-archive-container" class="lg:col-span-2 desktop-fit-outer">
-                    <div id="user-archive-fit-inner" class="desktop-fit-inner">
-                        <div id="user-archive-fit-canvas" class="desktop-fit-canvas bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-                            <div class="flex flex-row justify-between items-center gap-4 border-b pb-4">
-                                <h3 class="font-bold text-lg text-slate-900 flex items-center">
-                                    <span><i class="fa-solid fa-box-archive text-blue-600 mr-2"></i> Riwayat Laporan</span>
-                                    <span id="user-count-badge" class="ml-2 text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium">0 Laporan</span>
-                                </h3>
-                                
-                                <!-- Filter User -->
-                                <div class="flex flex-wrap gap-2 items-center">
-                                    <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tanggal Laporan</label>
-                                        <input type="date" id="user-filter-date" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 uppercase">Jenis Dokumentasi</label>
-                                        <select id="user-filter-kategori" class="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                                            <option value="">Semua Jenis</option>
-                                            <option value="PERSIAPAN (Absensi Relawan)">PERSIAPAN (Absensi Relawan)</option>
-                                            <option value="PERSIAPAN (Kegiatan Tim Persiapan)">PERSIAPAN (Kegiatan Tim Persiapan)</option>
-                                            <option value="PERSIAPAN (Limbah Sisa Pangan & Rijek)">PERSIAPAN (Limbah Sisa Pangan & Rijek)</option>
-                                            <option value="PERSIAPAN (Limbah B3)">PERSIAPAN (Limbah B3)</option>
-                                            <option value="PERSIAPAN (Foto Ruangan Selesai Pekerjaan)">PERSIAPAN (Foto Ruangan Selesai Pekerjaan)</option>
-                                            <option value="PERSIAPAN (Peralatan Rusak/Baru (jika ada))">PERSIAPAN (Peralatan Rusak/Baru (jika ada))</option>
-                                            <option value="PERSIAPAN (Serah Terima Persiapan - Pengolahan)">PERSIAPAN (Serah Terima Persiapan - Pengolahan)</option>
-                                            <option value="PENGOLAHAN (Absensi Relawan)">PENGOLAHAN (Absensi Relawan)</option>
-                                            <option value="PENGOLAHAN (Kegiatan Tim Pengolahan)">PENGOLAHAN (Kegiatan Tim Pengolahan)</option>
-                                            <option value="PENGOLAHAN (Limbah B3)">PENGOLAHAN (Limbah B3)</option>
-                                            <option value="PENGOLAHAN (Foto Ruangan Selesai Pekerjaan)">PENGOLAHAN (Foto Ruangan Selesai Pekerjaan)</option>
-                                            <option value="PENGOLAHAN (Peralatan Rusak/Baru (jika ada))">PENGOLAHAN (Peralatan Rusak/Baru (jika ada))</option>
-                                            <option value="PENGOLAHAN (Serah Terima Pengolahan - Pemorsian)">PENGOLAHAN (Serah Terima Pengolahan - Pemorsian)</option>
-                                            <option value="PEMORSIAN (Absensi Relawan)">PEMORSIAN (Absensi Relawan)</option>
-                                            <option value="PEMORSIAN (Kegiatan Tim Pemorsian)">PEMORSIAN (Kegiatan Tim Pemorsian)</option>
-                                            <option value="PEMORSIAN (Foto Sisa Makanan Pemorsian)">PEMORSIAN (Foto Sisa Makanan Pemorsian)</option>
-                                            <option value="PEMORSIAN (Limbah B3)">PEMORSIAN (Limbah B3)</option>
-                                            <option value="PEMORSIAN (Foto Ruangan Selesai Pekerjaan)">PEMORSIAN (Foto Ruangan Selesai Pekerjaan)</option>
-                                            <option value="PEMORSIAN (Peralatan Baru/Rusak (jika ada))">PEMORSIAN (Peralatan Baru/Rusak (jika ada))</option>
-                                            <option value="PEMORSIAN (Serah Terima Pemorsian - Distribusi)">PEMORSIAN (Serah Terima Pemorsian - Distribusi)</option>
-                                            <option value="DISTRIBUSI (Absensi Relawan)">DISTRIBUSI (Absensi Relawan)</option>
-                                            <option value="DISTRIBUSI (Limbah B3 (jika ada))">DISTRIBUSI (Limbah B3 (jika ada))</option>
-                                            <option value="DISTRIBUSI (Cuci Kendaraan)">DISTRIBUSI (Cuci Kendaraan)</option>
-                                            <option value="DISTRIBUSI (Foto Kendaraan)">DISTRIBUSI (Foto Kendaraan)</option>
-                                            <option value="DISTRIBUSI (Service Kendaraan jika ada)">DISTRIBUSI (Service Kendaraan jika ada)</option>
-                                            <option value="DISTRIBUSI (Peralatan Baru/Rusak (jika ada))">DISTRIBUSI (Peralatan Baru/Rusak (jika ada))</option>
-                                            <option value="FOODTRAY (Absensi Relawan)">FOODTRAY (Absensi Relawan)</option>
-                                            <option value="FOODTRAY (Kegiatan Tim Pencuci Ompreng)">FOODTRAY (Kegiatan Tim Pencuci Ompreng)</option>
-                                            <option value="FOODTRAY (Sisa Makanan Ompreng)">FOODTRAY (Sisa Makanan Ompreng)</option>
-                                            <option value="FOODTRAY (Limbah B3)">FOODTRAY (Limbah B3)</option>
-                                            <option value="FOODTRAY (Foto Ruangan Selesai Pekerjaan)">FOODTRAY (Foto Ruangan Selesai Pekerjaan)</option>
-                                            <option value="FOODTRAY (Peralatan Baru/Rusak (jika ada))">FOODTRAY (Peralatan Baru/Rusak (jika ada))</option>
-                                            <option value="FOODTRAY (Serah Terima Pencuci Foodtray - Aslap)">FOODTRAY (Serah Terima Pencuci Foodtray - Aslap)</option>
-                                            <option value="CLEANING SERVICE (Absensi)">CLEANING SERVICE (Absensi)</option>
-                                            <option value="CLEANING SERVICE (Kegiatan Saat Kebersihan)">CLEANING SERVICE (Kegiatan Saat Kebersihan)</option>
-                                            <option value="CLEANING SERVICE (Limbah B3)">CLEANING SERVICE (Limbah B3)</option>
-                                            <option value="CLEANING SERVICE (Foto Ruangan Selesai Pekerjaan)">CLEANING SERVICE (Foto Ruangan Selesai Pekerjaan)</option>
-                                            <option value="CLEANING SERVICE (Peralatan Baru/Rusak (jika ada))">CLEANING SERVICE (Peralatan Baru/Rusak (jika ada))</option>
-                                            <option value="CLEANING SERVICE (Serah Terima Cleaning Service - Scurity)">CLEANING SERVICE (Serah Terima Cleaning Service - Scurity)</option>
-                                            <option value="SCURITY (Absensi)">SCURITY (Absensi)</option>
-                                            <option value="SCURITY (Area Depan Dapur/Parkiran)">SCURITY (Area Depan Dapur/Parkiran)</option>
-                                            <option value="SCURITY (Bahan Baku Datang)">SCURITY (Bahan Baku Datang)</option>
-                                            <option value="SCURITY (Limbah B3 (jika ada))">SCURITY (Limbah B3 (jika ada))</option>
-                                            <option value="SCURITY (Saat Pengambilan Sampah/Limbah)">SCURITY (Saat Pengambilan Sampah/Limbah)</option>
-                                            <option value="SCURITY (Isi Tabung Gas (Jika ada))">SCURITY (Isi Tabung Gas (Jika ada))</option>
-                                            <option value="SCURITY (Isi Galon)">SCURITY (Isi Galon)</option>
-                                            <option value="SCURITY (Terima Paket indomaret/Shope)">SCURITY (Terima Paket indomaret/Shope)</option>
-                                            <option value="SCURITY (Peralatan Baru/Rusak (jika ada))">SCURITY (Peralatan Baru/Rusak (jika ada))</option>
-                                            <option value="SCURITY (Perbaikan Dapur/Lainnya)">SCURITY (Perbaikan Dapur/Lainnya)</option>
-                                            <option value="SCURITY (Serah Terima Scurity - Cleaning Service)">SCURITY (Serah Terima Scurity - Cleaning Service)</option>
-                                            <option value="ASLAP (Foto Per Bahan Baku)">ASLAP (Foto Per Bahan Baku)</option>
-                                            <option value="ADMIN SO (Foto SO Per Bahan Baku)">Admin SO (Foto SO Per Bahan Baku)</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex items-end space-x-1 pt-3">
-                                        <button onclick="applyUserFilter()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs font-medium transition">Cari</button>
-                                        <button onclick="resetUserFilter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded-lg text-xs font-medium transition">Reset</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="user-archive-list" class="space-y-3 max-h-[450px] overflow-y-auto pr-2"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ADMIN PANEL FULL (DIPAKSA MODE DESKTOP PENUH TANPA GESER & TANPA ZOOM) -->
-            <div id="admin-panel" class="hidden desktop-fit-outer">
-                <div id="admin-fit-inner" class="desktop-fit-inner">
-                    <div id="admin-fit-canvas" class="desktop-fit-canvas bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6">
-                        <div class="flex flex-row justify-between items-center gap-4 border-b pb-4">
-                            <h3 class="font-bold text-xl text-slate-900 flex items-center">
-                                <i class="fa-solid fa-shield-halved text-blue-600 mr-2"></i> Panel Kontrol & Arsip Full Admin
-                            </h3>
-                            
-                            <!-- Filter Admin -->
-                            <div class="flex flex-wrap gap-3 items-center">
-                                <div>
-                                    <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tanggal Laporan</label>
-                                    <input type="date" id="filter-date" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-semibold text-slate-500 uppercase">Jenis Dokumentasi</label>
-                                    <select id="filter-kategori" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                                        <option value="">Semua Jenis Dokumentasi</option>
-                                        <option value="PERSIAPAN (Absensi Relawan)">PERSIAPAN (Absensi Relawan)</option>
-                                        <option value="PERSIAPAN (Kegiatan Tim Persiapan)">PERSIAPAN (Kegiatan Tim Persiapan)</option>
-                                        <option value="PERSIAPAN (Limbah Sisa Pangan & Rijek)">PERSIAPAN (Limbah Sisa Pangan & Rijek)</option>
-                                        <option value="PERSIAPAN (Limbah B3)">PERSIAPAN (Limbah B3)</option>
-                                        <option value="PERSIAPAN (Foto Ruangan Selesai Pekerjaan)">PERSIAPAN (Foto Ruangan Selesai Pekerjaan)</option>
-                                        <option value="PERSIAPAN (Peralatan Rusak/Baru (jika ada))">PERSIAPAN (Peralatan Rusak/Baru (jika ada))</option>
-                                        <option value="PERSIAPAN (Serah Terima Persiapan - Pengolahan)">PERSIAPAN (Serah Terima Persiapan - Pengolahan)</option>
-                                        <option value="PENGOLAHAN (Absensi Relawan)">PENGOLAHAN (Absensi Relawan)</option>
-                                        <option value="PENGOLAHAN (Kegiatan Tim Pengolahan)">PENGOLAHAN (Kegiatan Tim Pengolahan)</option>
-                                        <option value="PENGOLAHAN (Limbah B3)">PENGOLAHAN (Limbah B3)</option>
-                                        <option value="PENGOLAHAN (Foto Ruangan Selesai Pekerjaan)">PENGOLAHAN (Foto Ruangan Selesai Pekerjaan)</option>
-                                        <option value="PENGOLAHAN (Peralatan Rusak/Baru (jika ada))">PENGOLAHAN (Peralatan Rusak/Baru (jika ada))</option>
-                                        <option value="PENGOLAHAN (Serah Terima Pengolahan - Pemorsian)">PENGOLAHAN (Serah Terima Pengolahan - Pemorsian)</option>
-                                        <option value="PEMORSIAN (Absensi Relawan)">PEMORSIAN (Absensi Relawan)</option>
-                                        <option value="PEMORSIAN (Kegiatan Tim Pemorsian)">PEMORSIAN (Kegiatan Tim Pemorsian)</option>
-                                        <option value="PEMORSIAN (Foto Sisa Makanan Pemorsian)">PEMORSIAN (Foto Sisa Makanan Pemorsian)</option>
-                                        <option value="PEMORSIAN (Limbah B3)">PEMORSIAN (Limbah B3)</option>
-                                        <option value="PEMORSIAN (Foto Ruangan Selesai Pekerjaan)">PEMORSIAN (Foto Ruangan Selesai Pekerjaan)</option>
-                                        <option value="PEMORSIAN (Peralatan Baru/Rusak (jika ada))">PEMORSIAN (Peralatan Baru/Rusak (jika ada))</option>
-                                        <option value="PEMORSIAN (Serah Terima Pemorsian - Distribusi)">PEMORSIAN (Serah Terima Pemorsian - Distribusi)</option>
-                                        <option value="DISTRIBUSI (Absensi Relawan)">DISTRIBUSI (Absensi Relawan)</option>
-                                        <option value="DISTRIBUSI (Limbah B3 (jika ada))">DISTRIBUSI (Limbah B3 (jika ada))</option>
-                                        <option value="DISTRIBUSI (Cuci Kendaraan)">DISTRIBUSI (Cuci Kendaraan)</option>
-                                        <option value="DISTRIBUSI (Foto Kendaraan)">DISTRIBUSI (Foto Kendaraan)</option>
-                                        <option value="DISTRIBUSI (Service Kendaraan jika ada)">DISTRIBUSI (Service Kendaraan jika ada)</option>
-                                        <option value="DISTRIBUSI (Peralatan Baru/Rusak (jika ada))">DISTRIBUSI (Peralatan Baru/Rusak (jika ada))</option>
-                                        <option value="FOODTRAY (Absensi Relawan)">FOODTRAY (Absensi Relawan)</option>
-                                        <option value="FOODTRAY (Kegiatan Tim Pencuci Ompreng)">FOODTRAY (Kegiatan Tim Pencuci Ompreng)</option>
-                                        <option value="FOODTRAY (Sisa Makanan Ompreng)">FOODTRAY (Sisa Makanan Ompreng)</option>
-                                        <option value="FOODTRAY (Limbah B3)">FOODTRAY (Limbah B3)</option>
-                                        <option value="FOODTRAY (Foto Ruangan Selesai Pekerjaan)">FOODTRAY (Foto Ruangan Selesai Pekerjaan)</option>
-                                        <option value="FOODTRAY (Peralatan Baru/Rusak (jika ada))">FOODTRAY (Peralatan Baru/Rusak (jika ada))</option>
-                                        <option value="FOODTRAY (Serah Terima Pencuci Foodtray - Aslap)">FOODTRAY (Serah Terima Pencuci Foodtray - Aslap)</option>
-                                        <option value="CLEANING SERVICE (Absensi)">CLEANING SERVICE (Absensi)</option>
-                                        <option value="CLEANING SERVICE (Kegiatan Saat Kebersihan)">CLEANING SERVICE (Kegiatan Saat Kebersihan)</option>
-                                        <option value="CLEANING SERVICE (Limbah B3)">CLEANING SERVICE (Limbah B3)</option>
-                                        <option value="CLEANING SERVICE (Foto Ruangan Selesai Pekerjaan)">CLEANING SERVICE (Foto Ruangan Selesai Pekerjaan)</option>
-                                        <option value="CLEANING SERVICE (Peralatan Baru/Rusak (jika ada))">CLEANING SERVICE (Peralatan Baru/Rusak (jika ada))</option>
-                                        <option value="CLEANING SERVICE (Serah Terima Cleaning Service - Scurity)">CLEANING SERVICE (Serah Terima Cleaning Service - Scurity)</option>
-                                        <option value="SCURITY (Absensi)">SCURITY (Absensi)</option>
-                                        <option value="SCURITY (Area Depan Dapur/Parkiran)">SCURITY (Area Depan Dapur/Parkiran)</option>
-                                        <option value="SCURITY (Bahan Baku Datang)">SCURITY (Bahan Baku Datang)</option>
-                                        <option value="SCURITY (Limbah B3 (jika ada))">SCURITY (Limbah B3 (jika ada))</option>
-                                        <option value="SCURITY (Saat Pengambilan Sampah/Limbah)">SCURITY (Saat Pengambilan Sampah/Limbah)</option>
-                                        <option value="SCURITY (Isi Tabung Gas (Jika ada))">SCURITY (Isi Tabung Gas (Jika ada))</option>
-                                        <option value="SCURITY (Isi Galon)">SCURITY (Isi Galon)</option>
-                                        <option value="SCURITY (Terima Paket indomaret/Shope)">SCURITY (Terima Paket indomaret/Shope)</option>
-                                        <option value="SCURITY (Peralatan Baru/Rusak (jika ada))">SCURITY (Peralatan Baru/Rusak (jika ada))</option>
-                                        <option value="SCURITY (Perbaikan Dapur/Lainnya)">SCURITY (Perbaikan Dapur/Lainnya)</option>
-                                        <option value="SCURITY (Serah Terima Scurity - Cleaning Service)">SCURITY (Serah Terima Scurity - Cleaning Service)</option>
-                                        <option value="ASLAP (Foto Per Bahan Baku)">ASLAP (Foto Per Bahan Baku)</option>
-                                        <option value="ADMIN SO (Foto SO Per Bahan Baku)">Admin SO (Foto SO Per Bahan Baku)</option>
-                                    </select>
-                                </div>
-                                <div class="flex items-end space-x-2">
-                                    <button onclick="applyAdminFilter()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition">Cari</button>
-                                    <button onclick="resetAdminFilter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">Reset</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tabel Data Arsip Admin -->
-                        <div>
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase border-b border-slate-200">
-                                        <th class="py-3 px-4">Tanggal & Waktu</th>
-                                        <th class="py-3 px-4">Pengguna (Uploader)</th>
-                                        <th class="py-3 px-4">Instansi</th>
-                                        <th class="py-3 px-4">Jenis Dokumentasi</th>
-                                        <th class="py-3 px-4">Foto (Preview)</th>
-                                        <th class="py-3 px-4 text-center">Status Drive</th>
-                                        <th class="py-3 px-4 text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-archive-list" class="divide-y divide-slate-100 text-sm"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- MODAL PRATINJAU FOTO & TOMBOL UNDUH -->
-    <div id="photo-modal" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4">
-        <div class="relative max-w-4xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b bg-slate-50">
-                <h3 class="font-bold text-slate-800 text-sm flex items-center">
-                    <i class="fa-solid fa-image mr-2 text-blue-600"></i> Pratinjau Foto Dokumentasi Web
-                </h3>
-                <div class="flex items-center space-x-2">
-                    <a id="modal-download-btn" href="" download="dokumentasi.jpg" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center shadow">
-                        <i class="fa-solid fa-download mr-1"></i> Unduh Foto
-                    </a>
-                    <button onclick="closePhotoModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold px-2">&times;</button>
-                </div>
-            </div>
-            <div class="p-4 flex justify-center items-center bg-slate-900 overflow-hidden min-h-[300px]">
-                <img id="modal-image-element" src="" alt="Pratinjau Foto" class="max-h-[75vh] object-contain rounded-lg shadow-lg">
-            </div>
-        </div>
+      <div class="input-group">
+        <label for="inputKeterangan" class="input-label">Nama Petugas:</label>
+        <input type="text" id="inputKeterangan" class="text-input" placeholder="Bapak Lili">
+      </div>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
-        &copy; 2026 Sistem Dokumentasi Kerja. All rights reserved.
-    </footer>
+    <!-- 2. 10 Kolom Foto -->
+    <div class="card">
+      <div class="section-title">2. Ambil / Pilih Foto (10 Kolom)</div>
+      <div class="slots-grid" id="slotsGrid"></div>
+    </div>
 
-    <!-- PENYESUAIAN MODE DESKTOP MUAT PENUH TANPA GESER & TANPA ZOOM -->
-    <script>
-        (function () {
-            var DESKTOP_WIDTH = 1120;
+    <!-- 3. Panel Status Antrean Sinkronisasi -->
+    <div class="card">
+      <div class="section-title">3. Status Antrean Sinkronisasi</div>
+      <div id="queuePanelList" class="empty-queue-msg">Belum ada riwayat antrean foto.</div>
+      <div class="queue-actions">
+        <button type="button" id="btnClearSent" class="btn-clear-sent">Bersihkan Terkirim</button>
+        <button type="button" id="btnRetryAll" class="btn-retry">Coba Kirim Ulang</button>
+      </div>
+    </div>
+  </div>
 
-            function fitSingleSection(outerId, innerId, canvasId) {
-                var outer = document.getElementById(outerId);
-                var inner = document.getElementById(innerId);
-                var canvas = document.getElementById(canvasId);
-                if (!outer || !inner || !canvas) return;
-                if (outer.classList.contains('hidden')) return;
+  <!-- Tombol Kirim Instan -->
+  <div class="bottom-bar">
+    <div class="bottom-inner">
+      <button type="button" id="btnKirim" class="btn-submit">KIRIM DOKUMENTASI (0 FOTO)</button>
+    </div>
+  </div>
 
-                var availableWidth = outer.clientWidth || document.documentElement.clientWidth || window.innerWidth;
-                if (availableWidth <= 0) return;
+  <script>
+    /**
+     * APLIKASI DOKUMENTASI FOTO OFFLINE-FIRST (ES5, SINGLE-FILE, ANTI GAGAL)
+     * Kompatibel Android 1 - terbaru, RAM 1GB+, dan WebView pratinjau.
+     */
+    (function() {
+      'use strict';
 
-                var scale = availableWidth < DESKTOP_WIDTH ? (availableWidth / DESKTOP_WIDTH) : 1;
+      // =====================================================================
+      // KONFIGURASI TELEGRAM & KOMPRESI
+      // =====================================================================
+      var BOT_TOKEN = '9291689649:AAEJECiTaHEkkdWSiDT_rmj-wR_YvkfJjw0';
+      var CHAT_ID = '9212263609';
+      var SEND_PHOTO_URL = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendPhoto';
+      var SEND_MEDIA_GROUP_URL = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMediaGroup';
 
-                canvas.style.width = DESKTOP_WIDTH + 'px';
-                canvas.style.minWidth = DESKTOP_WIDTH + 'px';
-                canvas.style.transform = 'scale(' + scale + ')';
-                canvas.style.webkitTransform = 'scale(' + scale + ')';
+      var TOTAL_SLOTS = 10;
+      var PRIMARY_MAX_DIM = 960;
+      var FALLBACK_MAX_DIM = 800;
+      var JPEG_QUALITY = 0.68;
+      var MAX_RAW_FALLBACK_BYTES = 2 * 1024 * 1024; // 2MB batas fallback mentah agar tidak membebani memori
 
-                var naturalHeight = canvas.offsetHeight || canvas.scrollHeight || 0;
-                var scaledHeight = Math.ceil(naturalHeight * scale);
-                inner.style.height = scaledHeight > 0 ? (scaledHeight + 'px') : 'auto';
-                inner.style.width = availableWidth + 'px';
-            }
+      // State Aplikasi
+      var selectedCategory = '1. Absensi';
+      var slotPhotos = new Array(TOTAL_SLOTS); // { dataUrl, timestamp, info }
+      var isSyncing = false;
+      var toastTimer = null;
 
-            window.fitDesktopSections = function () {
-                fitSingleSection('user-archive-container', 'user-archive-fit-inner', 'user-archive-fit-canvas');
-                fitSingleSection('admin-panel', 'admin-fit-inner', 'admin-fit-canvas');
-            };
+      // Penyimpanan Offline (IndexedDB -> localStorage -> In-Memory fallback)
+      var DB_NAME = 'DokFotoOfflineV2';
+      var DB_VERSION = 1;
+      var STORE_NAME = 'queueItems';
+      var dbInstance = null;
+      var storageMode = 'memory'; // 'indexeddb' | 'localstorage' | 'memory'
+      var LS_KEY = 'dok_foto_queue_v2';
+      var memoryQueue = [];
+      var memorySeq = 1;
 
-            window.addEventListener('resize', function () {
-                window.fitDesktopSections();
+      // =====================================================================
+      // UTILITAS UI & FORMAT
+      // =====================================================================
+      function showToast(message, type) {
+        var box = document.getElementById('toastBox');
+        if (!box) return;
+        box.textContent = message;
+        box.className = 'toast-box ' + (type || 'toast-success');
+        box.style.display = 'block';
+
+        if (toastTimer) {
+          clearTimeout(toastTimer);
+        }
+        toastTimer = setTimeout(function() {
+          box.style.display = 'none';
+        }, 3800);
+      }
+
+      function formatTanggalIndo(dateObj) {
+        var d = dateObj || new Date();
+        var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+        return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear() +
+               ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+      }
+
+      function isOnlineNow() {
+        if (typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean') {
+          return navigator.onLine;
+        }
+        return true;
+      }
+
+      function updateNetworkBadge() {
+        var badge = document.getElementById('netBadge');
+        if (!badge) return;
+        if (isOnlineNow()) {
+          badge.textContent = 'ONLINE';
+          badge.className = 'badge badge-online';
+        } else {
+          badge.textContent = 'OFFLINE';
+          badge.className = 'badge badge-offline';
+        }
+      }
+
+      function updateSubmitButton() {
+        var count = 0;
+        for (var i = 0; i < TOTAL_SLOTS; i++) {
+          if (slotPhotos[i]) count++;
+        }
+        var btn = document.getElementById('btnKirim');
+        if (btn) {
+          btn.textContent = 'KIRIM DOKUMENTASI (' + count + ' FOTO)';
+        }
+      }
+
+      // =====================================================================
+      // KATEGORI DOKUMENTASI
+      // =====================================================================
+      function initCategories() {
+        var list = document.getElementById('categoryList');
+        if (!list) return;
+        var labels = list.getElementsByTagName('label');
+
+        for (var i = 0; i < labels.length; i++) {
+          (function(lbl) {
+            lbl.addEventListener('click', function() {
+              for (var j = 0; j < labels.length; j++) {
+                labels[j].className = 'category-label';
+              }
+              lbl.className = 'category-label selected';
+              var radio = lbl.getElementsByTagName('input')[0];
+              if (radio) {
+                radio.checked = true;
+                selectedCategory = radio.value;
+              }
             });
-            window.addEventListener('orientationchange', function () {
-                setTimeout(window.fitDesktopSections, 150);
-            });
-            document.addEventListener('DOMContentLoaded', function () {
-                window.fitDesktopSections();
-                setTimeout(window.fitDesktopSections, 250);
-            });
-        })();
-    </script>
+          })(labels[i]);
+        }
+      }
 
-    <!-- FIREBASE SDK & SKRIP UTAMA -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      // =====================================================================
+      // 10 KOLOM UPLOAD FOTO & RESET INPUT FILE
+      // =====================================================================
+      function initSlots() {
+        var grid = document.getElementById('slotsGrid');
+        if (!grid) return;
+        var html = '';
+        for (var i = 0; i < TOTAL_SLOTS; i++) {
+          var num = i + 1;
+          html += '<div class="slot-wrapper">' +
+                    '<div class="slot-box" id="slotBox_' + i + '">' +
+                      '<label class="slot-trigger" for="fileInput_' + i + '" id="slotTrigger_' + i + '">' +
+                        '<span class="slot-number">Foto ' + num + '</span>' +
+                        '<span class="slot-icon">+</span>' +
+                        '<span class="slot-hint">Kamera / Galeri</span>' +
+                      '</label>' +
+                      '<input type="file" accept="image/*" capture="environment" class="slot-input" id="fileInput_' + i + '" data-index="' + i + '">' +
+                    '</div>' +
+                  '</div>';
+        }
+        grid.innerHTML = html;
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAvQjzU7gv4mQm1bV34Yh9taZLaEvX69Es",
-            authDomain: "dokumentasikerja-b6000.firebaseapp.com",
-            projectId: "dokumentasikerja-b6000",
-            storageBucket: "dokumentasikerja-b6000.firebasestorage.app",
-            messagingSenderId: "680864412160",
-            appId: "1:680864412160:web:30d13ad43dd8bbb3e75ee5",
-            measurementId: "G-PK4PQ878VB"
+        for (var j = 0; j < TOTAL_SLOTS; j++) {
+          bindSlotInput(j);
+        }
+      }
+
+      function bindSlotInput(idx) {
+        var inputEl = document.getElementById('fileInput_' + idx);
+        if (!inputEl) return;
+        inputEl.onchange = function(e) {
+          var files = (e && e.target && e.target.files) ? e.target.files : inputEl.files;
+          handleFileSelect(idx, files);
         };
+      }
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+      function resetFileInputElement(idx) {
+        var inputEl = document.getElementById('fileInput_' + idx);
+        if (!inputEl) return;
+        try {
+          inputEl.value = '';
+        } catch (err) {
+          // Fallback untuk WebView lama jika input.value = '' diblokir
+          var parent = inputEl.parentNode;
+          if (parent) {
+            var newInput = document.createElement('input');
+            newInput.type = 'file';
+            newInput.accept = 'image/*';
+            newInput.capture = 'environment';
+            newInput.className = 'slot-input';
+            newInput.id = 'fileInput_' + idx;
+            newInput.setAttribute('data-index', String(idx));
+            parent.replaceChild(newInput, inputEl);
+            bindSlotInput(idx);
+          }
+        }
+      }
 
-        window.db = db;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.getDocs = getDocs;
-        window.deleteDoc = deleteDoc;
-        window.doc = doc;
-        window.updateDoc = updateDoc;
-        window.query = query;
-        window.orderBy = orderBy;
-        window.serverTimestamp = serverTimestamp;
-        window.onSnapshot = onSnapshot;
-        
-        initializeAppState();
-    </script>
+      function renderSlotFilled(idx, dataUrl) {
+        var box = document.getElementById('slotBox_' + idx);
+        if (!box) return;
+        var num = idx + 1;
+        box.className = 'slot-box has-photo';
+        box.innerHTML = '<img src="' + dataUrl + '" class="slot-preview" alt="Foto ' + num + '">' +
+                        '<span class="slot-badge-top">Foto ' + num + '</span>' +
+                        '<button type="button" class="slot-remove-btn" id="removeBtn_' + idx + '" title="Hapus Foto">X</button>';
 
-    <script>
-        const TELEGRAM_BOT_TOKEN = "9100109980:AAEQG88G-OAESTF0nxgKFhxORo9I3ZtACnU";
-        const TELEGRAM_CHAT_ID = "9212263609";
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-tiExkycqhueEVFrhgNYuT02mIBLz-fL2uWnqW6J7YX__H8WVau6dDUFhfUsqBPO3/exec";
-        const REPORTS_CACHE_KEY = "cached_laporan_dokumentasi_v1";
+        var rmBtn = document.getElementById('removeBtn_' + idx);
+        if (rmBtn) {
+          rmBtn.onclick = function(e) {
+            if (e) {
+              if (e.preventDefault) e.preventDefault();
+              if (e.stopPropagation) e.stopPropagation();
+            }
+            clearSingleSlot(idx);
+          };
+        }
+      }
 
-        const usersDB = {
-            "Serang": { pass: "Mandiri02srg", role: "admin", name: "Admin" },
-            "Muamar": { pass: "Muamar2", role: "user", name: "Muamar" },
-            "Lili": { pass: "Lili2", role: "user", name: "Lili" },
-            "Amir": { pass: "Amir2", role: "user", name: "Amir Muzani" },
-            "Sopiyan": { pass: "Sopiyan2", role: "user", name: "Sopiyan" },
-            "Anisa": { pass: "Anisa2", role: "user", name: "Anisa Hayatun Nufus" },
-            "Jimi": { pass: "A1403DV", role: "user", name: "Jimi Kurniawan" },
-            "Galuh": { pass: "A1274KV", role: "user", name: "Wiranto Galuh Saputra" },
-            "Hendri": { pass: "Hendri2", role: "user", name: "Hendri Kuspiandi" },
-            "Suryati": { pass: "Suryati2", role: "user", name: "Suryati" },
-            "Munyadi": { pass: "Munyadi2", role: "user", name: "Munyadi" },
-            "Fajar": { pass: "Aslap123", role: "user", name: "Fajar Riki Ramadhan" },
-            "Warehouse": { pass: "Warehouse2", role: "user", name: "Warehouse" },
-            "KSPPG": { pass: "Serang2", role: "viewer", name: "Mohamad Fahrurozi" }
-        };
+      function clearSingleSlot(idx) {
+        slotPhotos[idx] = null;
+        var box = document.getElementById('slotBox_' + idx);
+        if (!box) return;
+        var num = idx + 1;
+        box.className = 'slot-box';
+        box.innerHTML = '<label class="slot-trigger" for="fileInput_' + idx + '" id="slotTrigger_' + idx + '">' +
+                          '<span class="slot-number">Foto ' + num + '</span>' +
+                          '<span class="slot-icon">+</span>' +
+                          '<span class="slot-hint">Kamera / Galeri</span>' +
+                        '</label>' +
+                        '<input type="file" accept="image/*" capture="environment" class="slot-input" id="fileInput_' + idx + '" data-index="' + idx + '">';
+        bindSlotInput(idx);
+        resetFileInputElement(idx);
+        updateSubmitButton();
+      }
 
-        let currentUser = null;
-        let isSyncingActive = false; 
-        let isUploadingInProgress = false;
-        let isDateManuallyModified = false; 
-        let allGlobalReports = [];
-        let realtimeUnsubscribe = null;
-        const sentDriveBatchKeys = new Set();
+      function resetAllSlots() {
+        for (var i = 0; i < TOTAL_SLOTS; i++) {
+          clearSingleSlot(i);
+        }
+      }
 
-        function getBatchDriveKey(payload) {
-            if (!payload) return "";
-            const groupId = payload.batchGroupId || payload.syncStartTime || "";
-            const idx = payload.batchIndex || 1;
-            const firstFile = (Array.isArray(payload.files) && payload.files[0] && payload.files[0].fileName) ? payload.files[0].fileName : "";
-            return `${groupId}_${idx}_${firstFile}`;
+      // =====================================================================
+      // PEMROSESAN FOTO BERLAPIS & KOMPRESI AMAN (ANDROID 1 - TERBARU, RAM 1GB+)
+      // =====================================================================
+      function handleFileSelect(idx, files) {
+        if (!files || !files.length) {
+          resetFileInputElement(idx);
+          return;
+        }
+        var file = files[0];
+        if (!file) {
+          resetFileInputElement(idx);
+          return;
         }
 
-        function loadCachedReports() {
-            try {
-                const raw = localStorage.getItem(REPORTS_CACHE_KEY);
-                if (!raw) return [];
-                const parsed = JSON.parse(raw);
-                return Array.isArray(parsed) ? parsed : [];
-            } catch (e) {
-                return [];
-            }
+        var box = document.getElementById('slotBox_' + idx);
+        if (box) {
+          box.className = 'slot-box processing';
+          var trig = document.getElementById('slotTrigger_' + idx);
+          if (trig) {
+            trig.innerHTML = '<span class="slot-number">Foto ' + (idx + 1) + '</span>' +
+                             '<span class="slot-hint" style="margin-top:12px;font-weight:bold;">Memproses...</span>';
+          }
         }
 
-        function saveCachedReports(list) {
-            try {
-                const lightweight = (Array.isArray(list) ? list : []).slice(0, 250).map(item => {
-                    const copy = Object.assign({}, item);
-                    copy.syncedToDrive = true;
-                    copy.syncFailed = false;
-                    if (Array.isArray(copy.files) && copy.files.length > 0) {
-                        copy.files = copy.files.map(f => ({
-                            fileName: f.fileName || "dokumentasi.jpg",
-                            fileData: f.fileData || "",
-                            category: f.category || copy.kategori || "",
-                            dateFolder: f.dateFolder || ""
-                        }));
-                    }
-                    if (copy.createdAt && typeof copy.createdAt === "object" && typeof copy.createdAt.toMillis === "function") {
-                        copy.createdAt = copy.createdAt.toMillis();
-                    } else if (copy.createdAt && typeof copy.createdAt === "object" && typeof copy.createdAt.seconds === "number") {
-                        copy.createdAt = copy.createdAt.seconds * 1000;
-                    }
-                    return copy;
-                });
-                localStorage.setItem(REPORTS_CACHE_KEY, JSON.stringify(lightweight));
-            } catch (e) {
-                try {
-                    const minimal = (Array.isArray(list) ? list : []).slice(0, 150).map(item => ({
-                        id: item.id,
-                        uploader: item.uploader,
-                        instansi: item.instansi,
-                        kategori: item.kategori,
-                        tanggal: item.tanggal,
-                        createdAt: typeof item.createdAt === "number" ? item.createdAt : Date.now(),
-                        syncStartTime: item.syncStartTime || Date.now(),
-                        syncedToDrive: true,
-                        syncFailed: false,
-                        files: Array.isArray(item.files) ? item.files.map(f => ({ fileName: f.fileName || "", fileData: "" })) : []
-                    }));
-                    localStorage.setItem(REPORTS_CACHE_KEY, JSON.stringify(minimal));
-                } catch (e2) {}
-            }
-        }
+        processPhotoWithFallbacks(file, function(errReason, resultDataUrl) {
+          // Selalu reset input file agar file yang sama bisa dipilih ulang kapan saja
+          resetFileInputElement(idx);
 
-        function applyReportsListToView(list) {
-            allGlobalReports = (Array.isArray(list) ? list : []).map(item => Object.assign({}, item, {
-                syncedToDrive: true,
-                syncFailed: false
-            }));
-            updateCategoryDropdownOptions();
+          if (errReason || !resultDataUrl) {
+            var reasonText = errReason ? String(errReason) : 'Data gambar kosong';
+            showToast('Gagal memproses foto (' + reasonText + '). Coba ambil ulang.', 'toast-error');
+            clearSingleSlot(idx);
+            return;
+          }
 
-            if (currentUser && currentUser.role === 'admin') {
-                const dateFilter = document.getElementById('filter-date') ? document.getElementById('filter-date').value : '';
-                const kategoriFilter = document.getElementById('filter-kategori') ? document.getElementById('filter-kategori').value : '';
-                renderAdminArchiveView({ date: dateFilter, kategori: kategoriFilter });
-            } else if (currentUser) {
-                const dateFilter = document.getElementById('user-filter-date') ? document.getElementById('user-filter-date').value : '';
-                const kategori = document.getElementById('user-filter-kategori') ? document.getElementById('user-filter-kategori').value : '';
-                renderUserArchiveView({ date: dateFilter, kategori: kategori });
-            }
+          slotPhotos[idx] = {
+            dataUrl: resultDataUrl,
+            timestamp: formatTanggalIndo(new Date())
+          };
 
-            if (typeof window.fitDesktopSections === "function") {
-                setTimeout(window.fitDesktopSections, 10);
-            }
-        }
-
-        let deviceSpec = {
-            isLowMemory: true,
-            isLegacyAndroid: false,
-            maxWidth: 640,
-            quality: 0.45,
-            chunkSize: 3,
-            isNetworkSlow: false,
-            networkReason: ""
-        };
-
-        function detectDeviceAndSpec() {
-            const ua = navigator.userAgent || "";
-            const mem = typeof navigator.deviceMemory === "number" ? navigator.deviceMemory : null;
-            const cores = typeof navigator.hardwareConcurrency === "number" ? navigator.hardwareConcurrency : 2;
-
-            let isLegacyAndroid = false;
-            const androidMatch = ua.match(/Android\s+([0-9]+(?:\.[0-9]+)?)/i);
-            if (androidMatch && parseFloat(androidMatch[1]) < 7.0) {
-                isLegacyAndroid = true;
-            }
-            if (!window.Promise || !window.fetch || !window.AbortController) {
-                isLegacyAndroid = true;
-            }
-
-            const isLowMemory = (mem !== null && mem <= 2) || (mem === null) || cores <= 2 || isLegacyAndroid;
-
-            if (isLegacyAndroid) {
-                deviceSpec.maxWidth = 540;
-                deviceSpec.quality = 0.42;
-                deviceSpec.chunkSize = 2;
-            } else if (isLowMemory) {
-                deviceSpec.maxWidth = 640;
-                deviceSpec.quality = 0.45;
-                deviceSpec.chunkSize = 3;
-            } else if (mem >= 6 && cores >= 6) {
-                deviceSpec.maxWidth = 960;
-                deviceSpec.quality = 0.6;
-                deviceSpec.chunkSize = 8;
-            } else {
-                deviceSpec.maxWidth = 800;
-                deviceSpec.quality = 0.52;
-                deviceSpec.chunkSize = 5;
-            }
-
-            deviceSpec.isLowMemory = isLowMemory;
-            deviceSpec.isLegacyAndroid = isLegacyAndroid;
-
-            if (isLowMemory || isLegacyAndroid) {
-                document.documentElement.classList.add("low-spec-mode");
-            } else {
-                document.documentElement.classList.remove("low-spec-mode");
-            }
-
-            const profileEl = document.getElementById("device-profile-info");
-            if (profileEl) {
-                const ramLabel = mem ? `RAM ~${mem}GB` : "Mode Hemat RAM";
-                const netLabel = deviceSpec.isNetworkSlow ? "Jaringan Lelet" : "Siap Kirim";
-                profileEl.innerText = `${ramLabel} • Resolusi Maks ${deviceSpec.maxWidth}px • Status: ${netLabel}`;
-            }
-        }
-
-        function showSlowNetworkPage(reasonText) {
-            const page = document.getElementById("slow-network-page");
-            const detail = document.getElementById("slow-network-detail");
-            if (detail && reasonText) {
-                detail.innerText = reasonText;
-            }
-            if (page) {
-                page.classList.remove("hidden");
-            }
-        }
-
-        function hideSlowNetworkPage() {
-            const page = document.getElementById("slow-network-page");
-            if (page) {
-                page.classList.add("hidden");
-            }
-            if (typeof window.fitDesktopSections === "function") {
-                window.fitDesktopSections();
-            }
-        }
-
-        async function measureActualNetworkLatency() {
-            if (navigator.onLine === false) {
-                return { slow: true, reason: "Perangkat sedang offline atau tidak ada koneksi internet. Jangan memaksa upload foto karena tidak akan terkirim." };
-            }
-
-            const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-            if (conn) {
-                const eff = (conn.effectiveType || "").toLowerCase();
-                const downlink = typeof conn.downlink === "number" ? conn.downlink : null;
-                const rtt = typeof conn.rtt === "number" ? conn.rtt : null;
-
-                if (eff === "slow-2g" || eff === "2g") {
-                    return { slow: true, reason: `Koneksi terdeteksi sangat lambat (${eff.toUpperCase()}). Upload foto berisiko gagal terkirim.` };
-                }
-                if (downlink !== null && downlink > 0 && downlink < 0.75) {
-                    return { slow: true, reason: `Kecepatan unduh/kirim hanya ${downlink} Mbps (lelet). Sebaiknya tunggu jaringan membaik sebelum mengirim foto.` };
-                }
-                if (rtt !== null && rtt > 1500) {
-                    return { slow: true, reason: `Respons jaringan sangat lambat (ping ${rtt} ms). Upload foto berisiko gagal.` };
-                }
-            }
-
-            try {
-                const startTs = new Date().getTime();
-                const testUrl = `${APPS_SCRIPT_URL}?ping=1&_t=${startTs}`;
-                if (typeof AbortController !== "undefined" && typeof fetch !== "undefined") {
-                    const ctrl = new AbortController();
-                    const timer = setTimeout(function() { ctrl.abort(); }, 2500);
-                    await fetch(testUrl, { method: "GET", mode: "no-cors", cache: "no-store", signal: ctrl.signal });
-                    clearTimeout(timer);
-                }
-                const elapsed = new Date().getTime() - startTs;
-                if (elapsed > 2200) {
-                    return { slow: true, reason: `Waktu respons jaringan lambat (${(elapsed / 1000).toFixed(1)} detik). Daripada memaksa upload foto tidak terkirim, silakan pindah ke jaringan yang lebih stabil.` };
-                }
-                return { slow: false, reason: "" };
-            } catch (err) {
-                return { slow: true, reason: "Koneksi ke server lambat atau terputus saat diperiksa. Jangan paksa upload foto agar tidak gagal terkirim." };
-            }
-        }
-
-        async function recheckNetworkNow(showPopupIfSlow) {
-            const statusText = document.getElementById("network-status");
-            const dot = document.getElementById("network-dot");
-
-            if (navigator.onLine === false) {
-                deviceSpec.isNetworkSlow = true;
-                deviceSpec.networkReason = "Koneksi internet terputus / Offline.";
-                if (statusText) statusText.innerText = "Jaringan Lelet / Offline";
-                if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
-                detectDeviceAndSpec();
-                if (showPopupIfSlow) {
-                    showSlowNetworkPage(deviceSpec.networkReason);
-                }
-                return false;
-            }
-
-            const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-            if (conn && typeof conn.downlink === "number") {
-                const speed = conn.downlink;
-                if (speed > 5 && conn.effectiveType !== "2g" && conn.effectiveType !== "slow-2g") {
-                    if (statusText) statusText.innerText = `Jaringan Cepat (${speed} Mbps)`;
-                    if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
-                    deviceSpec.isNetworkSlow = false;
-                    deviceSpec.networkReason = "";
-                    detectDeviceAndSpec();
-                    return true;
-                } else if (speed >= 0.75 && conn.effectiveType !== "2g" && conn.effectiveType !== "slow-2g") {
-                    if (statusText) statusText.innerText = `Jaringan Stabil (${speed} Mbps)`;
-                    if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-                    deviceSpec.isNetworkSlow = false;
-                    deviceSpec.networkReason = "";
-                    detectDeviceAndSpec();
-                    return true;
-                }
-            }
-
-            const check = await measureActualNetworkLatency();
-            if (check.slow) {
-                deviceSpec.isNetworkSlow = true;
-                deviceSpec.networkReason = check.reason;
-                if (statusText) statusText.innerText = "Jaringan Anda Lelet";
-                if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
-                detectDeviceAndSpec();
-                if (showPopupIfSlow) {
-                    showSlowNetworkPage(check.reason);
-                }
-                return false;
-            } else {
-                deviceSpec.isNetworkSlow = false;
-                deviceSpec.networkReason = "";
-                if (statusText) statusText.innerText = "Online (Normal)";
-                if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
-                detectDeviceAndSpec();
-                return true;
-            }
-        }
-
-        const ALL_CATEGORIES = [
-            "PERSIAPAN (Absensi Relawan)",
-            "PERSIAPAN (Kegiatan Tim Persiapan)",
-            "PERSIAPAN (Limbah Sisa Pangan & Rijek)",
-            "PERSIAPAN (Limbah B3)",
-            "PERSIAPAN (Foto Ruangan Selesai Pekerjaan)",
-            "PERSIAPAN (Peralatan Rusak/Baru (jika ada))",
-            "PERSIAPAN (Serah Terima Persiapan - Pengolahan)",
-            "PENGOLAHAN (Absensi Relawan)",
-            "PENGOLAHAN (Kegiatan Tim Pengolahan)",
-            "PENGOLAHAN (Limbah B3)",
-            "PENGOLAHAN (Foto Ruangan Selesai Pekerjaan)",
-            "PENGOLAHAN (Peralatan Rusak/Baru (jika ada))",
-            "PENGOLAHAN (Serah Terima Pengolahan - Pemorsian)",
-            "PEMORSIAN (Absensi Relawan)",
-            "PEMORSIAN (Kegiatan Tim Pemorsian)",
-            "PEMORSIAN (Foto Sisa Makanan Pemorsian)",
-            "PEMORSIAN (Limbah B3)",
-            "PEMORSIAN (Foto Ruangan Selesai Pekerjaan)",
-            "PEMORSIAN (Peralatan Baru/Rusak (jika ada))",
-            "PEMORSIAN (Serah Terima Pemorsian - Distribusi)",
-            "DISTRIBUSI (Absensi Relawan)",
-            "DISTRIBUSI (Limbah B3 (jika ada))",
-            "DISTRIBUSI (Cuci Kendaraan)",
-            "DISTRIBUSI (Foto Kendaraan)",
-            "DISTRIBUSI (Service Kendaraan jika ada)",
-            "DISTRIBUSI (Peralatan Baru/Rusak (jika ada))",
-            "DISTRIBUSI (Serah Terima Distribusi - Pencuci Foodtray)",
-            "FOODTRAY (Absensi Relawan)",
-            "FOODTRAY (Kegiatan Tim Pencuci Ompreng)",
-            "FOODTRAY (Sisa Makanan Ompreng)",
-            "FOODTRAY (Limbah B3)",
-            "FOODTRAY (Foto Ruangan Selesai Pekerjaan)",
-            "FOODTRAY (Peralatan Baru/Rusak (jika ada))",
-            "FOODTRAY (Serah Terima Pencuci Foodtray - Aslap)",
-            "CLEANING SERVICE (Absensi)",
-            "CLEANING SERVICE (Kegiatan Saat Kebersihan)",
-            "CLEANING SERVICE (Limbah B3)",
-            "CLEANING SERVICE (Foto Ruangan Selesai Pekerjaan)",
-            "CLEANING SERVICE (Peralatan Baru/Rusak (jika ada))",
-            "CLEANING SERVICE (Serah Terima Cleaning Service - Scurity)",
-            "SCURITY (Absensi)",
-            "SCURITY (Area Depan Dapur/Parkiran)",
-            "SCURITY (Bahan Baku Datang)",
-            "SCURITY (Limbah B3 (jika ada))",
-            "SCURITY (Saat Pengambilan Sampah/Limbah)",
-            "SCURITY (Isi Tabung Gas (Jika ada))",
-            "SCURITY (Isi Galon)",
-            "SCURITY (Terima Paket indomaret/Shope)",
-            "SCURITY (Peralatan Baru/Rusak (jika ada))",
-            "SCURITY (Perbaikan Dapur/Lainnya)",
-            "SCURITY (Serah Terima Scurity - Cleaning Service)",
-            "ASLAP (Foto Per Bahan Baku)",
-            "ADMIN SO (Foto SO Per Bahan Baku)"
-        ];
-
-        function updateCategoryDropdownOptions() {
-            const selectEl = document.getElementById('input-kategori');
-            const selectedDateInput = document.getElementById('input-tanggal-laporan');
-            if (!selectedDateInput) return;
-
-            const chosenDate = selectedDateInput.value;
-            const currentSelectedVal = selectEl ? selectEl.value : "";
-
-            const uploadedCategoriesToday = new Set();
-            allGlobalReports.forEach(rep => {
-                const repDate = rep.tanggal ? (rep.tanggal.includes('T') ? rep.tanggal.split('T')[0] : rep.tanggal) : '';
-                if (repDate === chosenDate) {
-                    uploadedCategoriesToday.add(rep.kategori);
-                }
-            });
-
-            if (selectEl) {
-                let optionsHtml = `<option value="">-- Pilih Jenis Dokumentasi --</option>`;
-                ALL_CATEGORIES.forEach(cat => {
-                    const isDone = uploadedCategoriesToday.has(cat);
-                    const labelStr = isDone ? `${cat} (Sudah Diupload)` : cat;
-                    optionsHtml += `<option value="${cat}">${labelStr}</option>`;
-                });
-
-                selectEl.innerHTML = optionsHtml;
-                if (currentSelectedVal) {
-                    selectEl.value = currentSelectedVal;
-                }
-            }
-
-            checkAndShowUploadReminder(chosenDate, uploadedCategoriesToday);
-        }
-
-        function checkAndShowUploadReminder(chosenDate, uploadedSet) {
-            const banner = document.getElementById('upload-reminder-banner');
-            const missingContainer = document.getElementById('missing-categories-tags');
-            const reminderText = document.getElementById('reminder-text');
-            if (!banner || !missingContainer) return;
-
-            const missingCategories = ALL_CATEGORIES.filter(cat => !uploadedSet.has(cat));
-
-            if (missingCategories.length > 0) {
-                reminderText.innerText = `Ada ${missingCategories.length} jenis foto dokumentasi yang BELUM diunggah untuk tanggal (${chosenDate}). Mohon segera lengkapi! Setiap Koordinator Divisi`;
-                
-                let tagsHtml = "";
-                missingCategories.forEach(cat => {
-                    tagsHtml += `<span class="bg-amber-200/80 text-amber-900 border border-amber-300 px-2 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1">
-                        <i class="fa-solid fa-clock text-amber-700"></i> ${cat}
-                    </span>`;
-                });
-                
-                missingContainer.innerHTML = tagsHtml;
-                banner.classList.remove('hidden');
-            } else {
-                banner.classList.add('hidden');
-            }
-        }
-
-        function setTodayDate() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const today = `${year}-${month}-${day}`;
-
-            const inputTanggal = document.getElementById('input-tanggal-laporan');
-            
-            if (inputTanggal && !isDateManuallyModified) {
-                if (inputTanggal.value !== today) {
-                    inputTanggal.value = today;
-                    updateCategoryDropdownOptions();
-                }
-            }
-
-            const dateLabel = document.getElementById('current-date-label');
-            if (dateLabel) {
-                dateLabel.innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            detectDeviceAndSpec();
-            const inputTanggal = document.getElementById('input-tanggal-laporan');
-            if (inputTanggal) {
-                inputTanggal.addEventListener('change', () => {
-                    isDateManuallyModified = true;
-                    updateCategoryDropdownOptions();
-                });
-            }
-
-            window.addEventListener("offline", () => {
-                deviceSpec.isNetworkSlow = true;
-                deviceSpec.networkReason = "Koneksi internet terputus (Offline). Jangan memaksa kirim foto agar tidak gagal.";
-                recheckNetworkNow(true);
-            });
-
-            window.addEventListener("online", () => {
-                recheckNetworkNow(false);
-                if (window.db && window.getDocs && window.collection) {
-                    fetchReportsFast();
-                }
-            });
-
-            const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-            if (conn && typeof conn.addEventListener === "function") {
-                conn.addEventListener("change", () => {
-                    recheckNetworkNow(false);
-                });
-            }
+          renderSlotFilled(idx, resultDataUrl);
+          updateSubmitButton();
         });
+      }
 
-        setInterval(setTodayDate, 1000);
-        setTodayDate();
-        detectDeviceAndSpec();
-        checkNetworkSpeed();
-
-        function checkNetworkSpeed() {
-            recheckNetworkNow(false);
+      /**
+       * Membaca File/Blob dengan fallback berlapis:
+       * 1) FileReader.readAsDataURL(file)
+       * 2) URL.createObjectURL / webkitURL.createObjectURL
+       */
+      function readFileAsImageSource(file, callback) {
+        var settled = false;
+        function done(err, srcUrl, isObjectUrl) {
+          if (settled) return;
+          settled = true;
+          callback(err, srcUrl, isObjectUrl);
         }
 
-        function togglePassword() {
-            const passInput = document.getElementById('login-password');
-            const eyeIcon = document.getElementById('eye-icon');
-            if (passInput.type === "password") {
-                passInput.type = "text";
-                eyeIcon.className = "fa-solid fa-eye-slash";
-            } else {
-                passInput.type = "password";
-                eyeIcon.className = "fa-solid fa-eye";
-            }
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const u = document.getElementById('login-username').value.trim();
-            const p = document.getElementById('login-password').value;
-            const errBox = document.getElementById('login-error');
-
-            if (usersDB[u] && usersDB[u].pass === p) {
-                currentUser = { username: u, ...usersDB[u] };
-                
-                const now = new Date();
-                const item = {
-                    user: currentUser,
-                    expiry: now.getTime() + (7 * 24 * 60 * 60 * 1000)
-                };
-                try {
-                    localStorage.setItem('currentUserSession', JSON.stringify(item));
-                } catch (err) {}
-
-                errBox.classList.add('hidden');
-                loadDashboard();
-            } else {
-                errBox.innerText = "Username atau Password salah!";
-                errBox.classList.remove('hidden');
-            }
-        }
-
-        function initializeAppState() {
-            const cached = loadCachedReports();
-            if (cached.length > 0) {
-                allGlobalReports = cached;
-            }
-
-            let savedStr = null;
+        function tryObjectUrl(prevErr) {
+          var URLObj = (typeof window !== 'undefined') ? (window.URL || window.webkitURL) : null;
+          if (URLObj && typeof URLObj.createObjectURL === 'function') {
             try {
-                savedStr = localStorage.getItem('currentUserSession');
-            } catch (e) {}
-            if (savedStr) {
-                try {
-                    const savedItem = JSON.parse(savedStr);
-                    const now = new Date();
-                    if (now.getTime() < savedItem.expiry) {
-                        currentUser = savedItem.user;
-                        loadDashboard();
-                    } else {
-                        localStorage.removeItem('currentUserSession');
-                    }
-                } catch (err) {
-                    try { localStorage.removeItem('currentUserSession'); } catch (e2) {}
-                }
+              var objUrl = URLObj.createObjectURL(file);
+              if (objUrl) {
+                done(null, objUrl, true);
+                return;
+              }
+            } catch (eObj) {
+              done('ObjectURL gagal: ' + (eObj.message || 'error'), null, false);
+              return;
             }
+          }
+          done(prevErr || 'Metode baca file tidak didukung', null, false);
         }
 
-        function renderDynamicUploadInputs() {
-            const container = document.getElementById('dynamic-upload-container');
-            if (!container) return;
-
-            const isLili = currentUser && (currentUser.username.toLowerCase() === 'lili' || currentUser.name.toLowerCase() === 'lili');
-
-            if (isLili) {
-                let html = `<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Upload Foto</label>`;
-                for (let i = 1; i <= 10; i++) {
-                    html += `
-                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                            <span class="block text-[11px] font-bold text-blue-700">Kolom Foto ${i}</span>
-                            <input type="file" id="input-file-lili-${i}" accept="image/*" multiple
-                                class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-                        </div>
-                    `;
-                }
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = `
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Foto</label>
-                        <input type="file" id="input-files" multiple accept="image/*" required 
-                            class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-                    </div>
-                `;
-            }
+        if (typeof FileReader !== 'undefined') {
+          try {
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+              var res = (ev && ev.target && ev.target.result) ? ev.target.result : reader.result;
+              if (res && typeof res === 'string' && res.indexOf('data:') === 0) {
+                done(null, res, false);
+              } else {
+                tryObjectUrl('Hasil FileReader kosong');
+              }
+            };
+            reader.onerror = function() {
+              tryObjectUrl('FileReader error');
+            };
+            reader.onabort = function() {
+              tryObjectUrl('FileReader dibatalkan');
+            };
+            reader.readAsDataURL(file);
+            return;
+          } catch (eReader) {
+            tryObjectUrl('FileReader exception');
+            return;
+          }
         }
 
-        function loadDashboard() {
-            detectDeviceAndSpec();
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('header-nav').classList.remove('hidden');
-            document.getElementById('dashboard-section').classList.remove('hidden');
-            document.getElementById('display-username').innerText = currentUser.name;
+        tryObjectUrl('FileReader tidak tersedia');
+      }
 
-            setTodayDate();
-            renderDynamicUploadInputs();
-
-            const now = new Date();
-            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
-            if (currentUser.role === 'admin') {
-                document.getElementById('user-role-badge').innerText = "Administrator Panel";
-                document.getElementById('welcome-message').innerText = `Selamat Datang ${currentUser.name}`;
-                document.getElementById('admin-panel').classList.remove('hidden');
-                document.getElementById('user-panel').classList.remove('hidden');
-                document.getElementById('upload-form-container').classList.remove('hidden');
-                document.getElementById('user-archive-container').classList.add('hidden');
-                
-                document.getElementById('filter-date').value = todayStr;
-                applyReportsListToView(allGlobalReports);
-                initRealtimeListener();
-            } else if (currentUser.role === 'viewer') {
-                document.getElementById('user-role-badge').innerText = `Viewer - ${currentUser.name}`;
-                document.getElementById('welcome-message').innerText = `Selamat Datang ${currentUser.name}`;
-                document.getElementById('user-panel').classList.remove('hidden');
-                document.getElementById('admin-panel').classList.add('hidden');
-                
-                document.getElementById('upload-form-container').classList.add('hidden');
-                const userArchiveContainer = document.getElementById('user-archive-container');
-                userArchiveContainer.classList.remove('hidden');
-                userArchiveContainer.classList.remove('lg:col-span-2');
-                userArchiveContainer.classList.add('lg:col-span-3');
-
-                document.getElementById('user-filter-date').value = todayStr;
-                applyReportsListToView(allGlobalReports);
-                initRealtimeListener();
-            } else {
-                document.getElementById('user-role-badge').innerText = `User - ${currentUser.name}`;
-                document.getElementById('welcome-message').innerText = `Selamat Datang ${currentUser.name}`;
-                document.getElementById('user-panel').classList.remove('hidden');
-                document.getElementById('admin-panel').classList.add('hidden');
-                
-                const uploadFormContainer = document.getElementById('upload-form-container');
-                uploadFormContainer.classList.remove('hidden');
-                
-                const userArchiveContainer = document.getElementById('user-archive-container');
-                userArchiveContainer.classList.remove('hidden');
-                userArchiveContainer.classList.remove('lg:col-span-3');
-                userArchiveContainer.classList.add('lg:col-span-2');
-
-                document.getElementById('user-filter-date').value = todayStr;
-                applyReportsListToView(allGlobalReports);
-                initRealtimeListener();
-            }
-
-            if (typeof window.fitDesktopSections === "function") {
-                setTimeout(window.fitDesktopSections, 10);
-            }
+      /**
+       * Menggambar gambar ke canvas dengan batas ukuran tertentu & fallback toDataURL
+       */
+      function renderImageToCompressedDataUrl(img, maxDim, quality) {
+        var natW = img.naturalWidth || img.width || 0;
+        var natH = img.naturalHeight || img.height || 0;
+        if (!natW || !natH) {
+          throw new Error('Dimensi gambar 0');
         }
 
-        function logout() {
-            try { localStorage.removeItem('currentUserSession'); } catch (e) {}
-            location.reload();
+        var targetW = natW;
+        var targetH = natH;
+        if (targetW > targetH) {
+          if (targetW > maxDim) {
+            targetH = Math.max(1, Math.round(targetH * (maxDim / targetW)));
+            targetW = maxDim;
+          }
+        } else {
+          if (targetH > maxDim) {
+            targetW = Math.max(1, Math.round(targetW * (maxDim / targetH)));
+            targetH = maxDim;
+          }
         }
 
-        async function fetchReportsFast() {
-            if (!window.db || !window.getDocs || !window.collection) return;
+        var canvas = document.createElement('canvas');
+        canvas.width = targetW;
+        canvas.height = targetH;
+
+        var ctx = canvas.getContext('2d');
+        if (!ctx) {
+          canvas.width = 1;
+          canvas.height = 1;
+          throw new Error('Canvas 2D tidak tersedia');
+        }
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, targetW, targetH);
+        ctx.drawImage(img, 0, 0, targetW, targetH);
+
+        var dataUrl = null;
+        try {
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        } catch (eToDataUrl) {
+          // Fallback toDataURL tanpa parameter kualitas (beberapa WebView lama)
+          try {
+            dataUrl = canvas.toDataURL('image/jpeg');
+          } catch (eFallbackType) {
+            dataUrl = canvas.toDataURL();
+          }
+        }
+
+        // Bersihkan memori canvas secara eksplisit untuk HP RAM 1GB
+        try {
+          ctx.clearRect(0, 0, targetW, targetH);
+          canvas.width = 1;
+          canvas.height = 1;
+        } catch (eClean) {}
+        ctx = null;
+        canvas = null;
+
+        if (!dataUrl || typeof dataUrl !== 'string' || dataUrl.indexOf('data:image') !== 0 || dataUrl.length < 100) {
+          throw new Error('toDataURL gagal/kosong');
+        }
+
+        return dataUrl;
+      }
+
+      /**
+       * Proses lengkap foto dengan fallback berlapis & decode aman
+       */
+      function processPhotoWithFallbacks(file, callback) {
+        readFileAsImageSource(file, function(readErr, srcUrl, isObjectUrl) {
+          var URLObj = (typeof window !== 'undefined') ? (window.URL || window.webkitURL) : null;
+
+          function revokeIfNeeded() {
+            if (isObjectUrl && URLObj && typeof URLObj.revokeObjectURL === 'function' && srcUrl) {
+              try {
+                URLObj.revokeObjectURL(srcUrl);
+              } catch (eRev) {}
+            }
+          }
+
+          if (readErr || !srcUrl) {
+            // Fallback terakhir: jika file berupa dataURL/string atau ukuran wajar, coba baca mentah
+            callback(readErr || 'Gagal membaca file', null);
+            return;
+          }
+
+          var img = new Image();
+          try {
+            img.crossOrigin = 'anonymous';
+          } catch (eCors) {}
+
+          var finished = false;
+          function finishWith(errMsg, outDataUrl) {
+            if (finished) return;
+            finished = true;
+            revokeIfNeeded();
             try {
-                const snap = await window.getDocs(window.collection(window.db, "laporan_dokumentasi"));
-                let list = [];
-                snap.forEach(docSnap => {
-                    list.push({ id: docSnap.id, ...docSnap.data(), syncedToDrive: true, syncFailed: false });
+              img.onload = null;
+              img.onerror = null;
+              img.src = '';
+            } catch (eImgClean) {}
+            img = null;
+            callback(errMsg, outDataUrl);
+          }
+
+          function runCompressionStages() {
+            // Tahap 1: Kompresi utama 960px, kualitas 0.68
+            try {
+              var out1 = renderImageToCompressedDataUrl(img, PRIMARY_MAX_DIM, JPEG_QUALITY);
+              finishWith(null, out1);
+              return;
+            } catch (eStage1) {
+              // Tahap 2: Kompresi lebih hemat memori 800px, kualitas 0.68
+              try {
+                var out2 = renderImageToCompressedDataUrl(img, FALLBACK_MAX_DIM, JPEG_QUALITY);
+                finishWith(null, out2);
+                return;
+              } catch (eStage2) {
+                // Tahap 3: Fallback data mentah jika sumber sudah berupa data:image dan ukuran wajar
+                if (!isObjectUrl && typeof srcUrl === 'string' && srcUrl.indexOf('data:image') === 0) {
+                  var approxBytes = Math.round((srcUrl.length * 3) / 4);
+                  if (approxBytes <= MAX_RAW_FALLBACK_BYTES) {
+                    finishWith(null, srcUrl);
+                    return;
+                  }
+                }
+                finishWith('Kompresi gagal: ' + (eStage2.message || eStage1.message || 'memori penuh'), null);
+              }
+            }
+          }
+
+          img.onload = function() {
+            if (typeof img.decode === 'function') {
+              try {
+                img.decode().then(function() {
+                  runCompressionStages();
+                }, function() {
+                  // Jika decode() reject pada WebView tertentu, tetap lanjutkan ke kompresi
+                  runCompressionStages();
                 });
-                saveCachedReports(list);
-                applyReportsListToView(list);
+                return;
+              } catch (eDecode) {
+                runCompressionStages();
+                return;
+              }
+            }
+            runCompressionStages();
+          };
+
+          img.onerror = function() {
+            if (!isObjectUrl && typeof srcUrl === 'string' && srcUrl.indexOf('data:image') === 0) {
+              var approxBytes = Math.round((srcUrl.length * 3) / 4);
+              if (approxBytes <= MAX_RAW_FALLBACK_BYTES) {
+                finishWith(null, srcUrl);
+                return;
+              }
+            }
+            finishWith('Gambar tidak dapat dimuat', null);
+          };
+
+          img.src = srcUrl;
+        });
+      }
+
+      // =====================================================================
+      // PENYIMPANAN LOKAL (INDEXEDDB -> LOCALSTORAGE -> MEMORY)
+      // =====================================================================
+      function loadMemoryFromLocalStorage() {
+        try {
+          var raw = localStorage.getItem(LS_KEY);
+          if (!raw) return [];
+          var parsed = JSON.parse(raw);
+          return (parsed && parsed.length) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveMemoryToLocalStorage(list) {
+        try {
+          localStorage.setItem(LS_KEY, JSON.stringify(list));
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function initStorage(callback) {
+        var idb = (typeof window !== 'undefined')
+          ? (window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB)
+          : null;
+
+        if (!idb) {
+          storageMode = 'localstorage';
+          memoryQueue = loadMemoryFromLocalStorage();
+          if (callback) callback();
+          return;
+        }
+
+        try {
+          var req = idb.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = function(e) {
+            var db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+              db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+            }
+          };
+          req.onsuccess = function(e) {
+            dbInstance = e.target.result;
+            storageMode = 'indexeddb';
+            if (callback) callback();
+          };
+          req.onerror = function() {
+            storageMode = 'localstorage';
+            memoryQueue = loadMemoryFromLocalStorage();
+            if (callback) callback();
+          };
+        } catch (err) {
+          storageMode = 'localstorage';
+          memoryQueue = loadMemoryFromLocalStorage();
+          if (callback) callback();
+        }
+      }
+
+      function addQueueItems(newItems, callback) {
+        if (storageMode === 'indexeddb' && dbInstance) {
+          try {
+            var tx = dbInstance.transaction([STORE_NAME], 'readwrite');
+            var store = tx.objectStore(STORE_NAME);
+            for (var i = 0; i < newItems.length; i++) {
+              store.add(newItems[i]);
+            }
+            tx.oncomplete = function() {
+              if (callback) callback(null);
+            };
+            tx.onerror = function() {
+              // Fallback ke localStorage/memory bila IndexedDB gagal menulis
+              for (var k = 0; k < newItems.length; k++) {
+                newItems[k].id = 'mem_' + (memorySeq++) + '_' + Date.now();
+                memoryQueue.push(newItems[k]);
+              }
+              saveMemoryToLocalStorage(memoryQueue);
+              if (callback) callback(null);
+            };
+            return;
+          } catch (eIdb) {}
+        }
+
+        for (var j = 0; j < newItems.length; j++) {
+          newItems[j].id = 'mem_' + (memorySeq++) + '_' + Date.now();
+          memoryQueue.push(newItems[j]);
+        }
+        if (storageMode === 'localstorage') {
+          if (!saveMemoryToLocalStorage(memoryQueue)) {
+            storageMode = 'memory';
+          }
+        }
+        if (callback) callback(null);
+      }
+
+      function fetchAllQueueItems(callback) {
+        if (storageMode === 'indexeddb' && dbInstance) {
+          try {
+            var tx = dbInstance.transaction([STORE_NAME], 'readonly');
+            var store = tx.objectStore(STORE_NAME);
+            var list = [];
+            var cursorReq = store.openCursor();
+            cursorReq.onsuccess = function(e) {
+              var cursor = e.target.result;
+              if (cursor) {
+                list.push(cursor.value);
+                cursor.continue();
+              } else {
+                callback(null, list);
+              }
+            };
+            cursorReq.onerror = function() {
+              callback(null, memoryQueue.slice(0));
+            };
+            return;
+          } catch (e) {
+            callback(null, memoryQueue.slice(0));
+            return;
+          }
+        }
+
+        if (storageMode === 'localstorage') {
+          memoryQueue = loadMemoryFromLocalStorage();
+        }
+        callback(null, memoryQueue.slice(0));
+      }
+
+      function updateQueueItem(item, callback) {
+        if (storageMode === 'indexeddb' && dbInstance) {
+          try {
+            var tx = dbInstance.transaction([STORE_NAME], 'readwrite');
+            var store = tx.objectStore(STORE_NAME);
+            store.put(item);
+            tx.oncomplete = function() {
+              if (callback) callback();
+            };
+            tx.onerror = function() {
+              if (callback) callback();
+            };
+            return;
+          } catch (e) {}
+        }
+
+        for (var i = 0; i < memoryQueue.length; i++) {
+          if (memoryQueue[i].id === item.id) {
+            memoryQueue[i] = item;
+            break;
+          }
+        }
+        if (storageMode === 'localstorage') {
+          saveMemoryToLocalStorage(memoryQueue);
+        }
+        if (callback) callback();
+      }
+
+      function removeSentItems(callback) {
+        if (storageMode === 'indexeddb' && dbInstance) {
+          fetchAllQueueItems(function(err, items) {
+            try {
+              var tx = dbInstance.transaction([STORE_NAME], 'readwrite');
+              var store = tx.objectStore(STORE_NAME);
+              for (var i = 0; i < items.length; i++) {
+                if (items[i].status === 'sent') {
+                  store.delete(items[i].id);
+                }
+              }
+              tx.oncomplete = function() {
+                if (callback) callback();
+              };
+              tx.onerror = function() {
+                if (callback) callback();
+              };
             } catch (e) {
-                // Jika jaringan lelet, biarkan cache tetap tampil tanpa mengganggu UI
+              if (callback) callback();
             }
+          });
+          return;
         }
 
-        function initRealtimeListener() {
-            if (!window.db || !window.onSnapshot || !window.collection) return;
-
-            const cached = loadCachedReports();
-            if (cached.length > 0) {
-                applyReportsListToView(cached);
-            }
-
-            fetchReportsFast();
-
-            if (typeof realtimeUnsubscribe === "function") {
-                try { realtimeUnsubscribe(); } catch (e) {}
-            }
-
-            realtimeUnsubscribe = window.onSnapshot(
-                window.collection(window.db, "laporan_dokumentasi"),
-                { includeMetadataChanges: true },
-                (snapshot) => {
-                    let list = [];
-                    snapshot.forEach(docSnap => {
-                        list.push({ id: docSnap.id, ...docSnap.data(), syncedToDrive: true, syncFailed: false });
-                    });
-                    saveCachedReports(list);
-                    applyReportsListToView(list);
-                },
-                () => {
-                    // Tetap pertahankan data cache lokal bila terjadi gangguan jaringan
-                }
-            );
+        var kept = [];
+        for (var j = 0; j < memoryQueue.length; j++) {
+          if (memoryQueue[j].status !== 'sent') {
+            kept.push(memoryQueue[j]);
+          }
         }
-
-        async function compressImageAndGetBase64(file, maxWidth, quality) {
-            const targetMaxWidth = maxWidth || deviceSpec.maxWidth;
-            const targetQuality = typeof quality === "number" ? quality : deviceSpec.quality;
-
-            return new Promise((resolve) => {
-                if (!file) {
-                    resolve("");
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const rawDataUrl = event.target ? event.target.result : "";
-                    if (!rawDataUrl || typeof rawDataUrl !== "string") {
-                        resolve("");
-                        return;
-                    }
-
-                    const img = new Image();
-                    img.onload = () => {
-                        let canvas = null;
-                        try {
-                            let width = img.naturalWidth || img.width;
-                            let height = img.naturalHeight || img.height;
-
-                            if (!width || !height) {
-                                resolve(rawDataUrl);
-                                return;
-                            }
-
-                            if (width > targetMaxWidth) {
-                                height = Math.round((height * targetMaxWidth) / width);
-                                width = targetMaxWidth;
-                            }
-
-                            canvas = document.createElement('canvas');
-                            canvas.width = width;
-                            canvas.height = height;
-
-                            const ctx = canvas.getContext('2d');
-                            if (!ctx) {
-                                resolve(rawDataUrl);
-                                return;
-                            }
-
-                            ctx.imageSmoothingEnabled = true;
-                            ctx.imageSmoothingQuality = deviceSpec.isLowMemory ? "low" : "medium";
-                            ctx.drawImage(img, 0, 0, width, height);
-
-                            const base64String = canvas.toDataURL('image/jpeg', targetQuality);
-
-                            canvas.width = 0;
-                            canvas.height = 0;
-                            img.src = "";
-
-                            resolve(base64String);
-                        } catch (err) {
-                            console.warn("Gagal kompres canvas, menggunakan file mentah:", err);
-                            try {
-                                if (canvas) {
-                                    canvas.width = 0;
-                                    canvas.height = 0;
-                                }
-                                img.src = "";
-                            } catch (e2) {}
-                            resolve(rawDataUrl);
-                        }
-                    };
-                    img.onerror = () => {
-                        resolve(rawDataUrl);
-                    };
-                    img.src = rawDataUrl;
-                };
-                reader.onerror = () => {
-                    resolve(""); 
-                };
-                try {
-                    reader.readAsDataURL(file);
-                } catch (e) {
-                    resolve("");
-                }
-            });
+        memoryQueue = kept;
+        if (storageMode === 'localstorage') {
+          saveMemoryToLocalStorage(memoryQueue);
         }
+        if (callback) callback();
+      }
 
-        function checkGlobalSyncStatus() {
-            const btnUpload = document.getElementById('btn-upload');
-            if (!btnUpload) return;
-
-            if (isUploadingInProgress) {
-                btnUpload.disabled = true;
-                btnUpload.classList.add('opacity-50', 'cursor-not-allowed');
-                return;
+      function resetFailedToPending(callback) {
+        fetchAllQueueItems(function(err, items) {
+          var idx = 0;
+          function step() {
+            if (idx >= items.length) {
+              if (callback) callback();
+              return;
             }
-
-            isSyncingActive = false;
-            btnUpload.disabled = false;
-            btnUpload.classList.remove('opacity-50', 'cursor-not-allowed');
-            btnUpload.innerHTML = `<i class="fa-solid fa-upload mr-1"></i> Upload Laporan`;
-        }
-
-        function runUploadCountdown(seconds = 3) {
-            return new Promise((resolve) => {
-                let current = 1;
-                Swal.fire({
-                    html: `
-                        <div class="py-4">
-                            <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl font-extrabold">
-                                <span id="upload-countdown-num">${current}</span>
-                            </div>
-                            <h2 class="text-xl font-bold text-slate-800 mb-1">Mengirim Laporan...</h2>
-                            <p class="text-xs text-slate-500">Mohon tunggu, jangan klik tombol berulang kali.</p>
-                        </div>
-                    `,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    customClass: { popup: 'rounded-3xl shadow-2xl border border-slate-100' },
-                    didOpen: () => {
-                        const timer = setInterval(() => {
-                            current += 1;
-                            const numEl = document.getElementById('upload-countdown-num');
-                            if (current <= seconds) {
-                                if (numEl) numEl.textContent = String(current);
-                            } else {
-                                clearInterval(timer);
-                                resolve();
-                            }
-                        }, 600);
-                    }
-                });
-            });
-        }
-
-        async function handleUpload(e) {
-            e.preventDefault();
-
-            if (isUploadingInProgress) {
-                return;
-            }
-
-            const tanggalPilih = document.getElementById('input-tanggal-laporan').value;
-            const instansi = document.getElementById('input-instansi').value;
-            const kategori = document.getElementById('input-kategori').value;
-            const btnUpload = document.getElementById('btn-upload');
-
-            if (!tanggalPilih || !kategori) {
-                Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Silakan lengkapi tanggal dan pilih jenis dokumentasi!', confirmButtonColor: '#2563eb' });
-                return;
-            }
-
-            const isLiliUser = currentUser && (currentUser.username.toLowerCase() === 'lili' || currentUser.name.toLowerCase() === 'lili');
-            let rawFilesArray = [];
-
-            if (isLiliUser) {
-                for (let i = 1; i <= 10; i++) {
-                    const fileInputRow = document.getElementById(`input-file-lili-${i}`);
-                    if (fileInputRow && fileInputRow.files.length > 0) {
-                        for (let f = 0; f < fileInputRow.files.length; f++) {
-                            rawFilesArray.push(fileInputRow.files[f]);
-                        }
-                    }
-                }
-
-                if (rawFilesArray.length === 0) {
-                    Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Pilih minimal 1 foto dari kolom yang tersedia untuk melanjutkan!', confirmButtonColor: '#2563eb' });
-                    return;
-                }
+            var it = items[idx++];
+            if (it.status === 'failed') {
+              it.status = 'pending';
+              it.lastError = '';
+              updateQueueItem(it, step);
             } else {
-                const fileInput = document.getElementById('input-files');
-                if (!fileInput || fileInput.files.length < 1) {
-                    Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Pilih minimal 1 foto untuk melanjutkan!', confirmButtonColor: '#2563eb' });
+              step();
+            }
+          }
+          step();
+        });
+      }
+
+      // =====================================================================
+      // RENDER PANEL STATUS ANTREAN
+      // =====================================================================
+      function refreshQueueUI(callback) {
+        fetchAllQueueItems(function(err, items) {
+          var list = items || [];
+          var pendingCount = 0;
+          var sentCount = 0;
+          var failedCount = 0;
+
+          for (var i = 0; i < list.length; i++) {
+            if (list[i].status === 'sent') sentCount++;
+            else if (list[i].status === 'failed') failedCount++;
+            else pendingCount++;
+          }
+
+          var summaryEl = document.getElementById('queueSummary');
+          if (summaryEl) {
+            summaryEl.textContent = 'Menunggu: ' + pendingCount + ' | Terkirim: ' + sentCount + ' | Gagal: ' + failedCount;
+          }
+
+          var panelEl = document.getElementById('queuePanelList');
+          if (panelEl) {
+            if (list.length === 0) {
+              panelEl.className = 'empty-queue-msg';
+              panelEl.textContent = 'Belum ada antrean foto.';
+            } else {
+              panelEl.className = '';
+              // Tampilkan maksimal 15 item terbaru agar DOM tetap ringan di HP RAM 1GB
+              var startIdx = list.length > 15 ? list.length - 15 : 0;
+              var html = '<ul class="queue-list">';
+              for (var j = list.length - 1; j >= startIdx; j--) {
+                var item = list[j];
+                var statusLabel = 'Menunggu';
+                var statusClass = 'q-status-pending';
+                if (item.status === 'sent') {
+                  statusLabel = 'Terkirim';
+                  statusClass = 'q-status-sent';
+                } else if (item.status === 'failed') {
+                  statusLabel = 'Gagal' + (item.lastError ? ' (' + item.lastError + ')' : '');
+                  statusClass = 'q-status-failed';
+                }
+
+                html += '<li class="queue-item">' +
+                          '<div class="queue-item-top">' + escapeHtml(item.category) + ' &bull; Foto ' + item.photoIndex + '/' + item.totalInBatch + '</div>' +
+                          '<div class="queue-item-meta">' + escapeHtml(item.timestamp) + (item.keterangan ? ' &bull; ' + escapeHtml(item.keterangan) : '') + '</div>' +
+                          '<div class="' + statusClass + '">Status: ' + escapeHtml(statusLabel) + '</div>' +
+                        '</li>';
+              }
+              html += '</ul>';
+              panelEl.innerHTML = html;
+            }
+          }
+
+          if (callback) {
+            callback({
+              all: list,
+              pendingCount: pendingCount,
+              sentCount: sentCount,
+              failedCount: failedCount
+            });
+          }
+        });
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      // =====================================================================
+      // TOMBOL KIRIM DOKUMENTASI (INSTANT SUCCESS & BACKGROUND SYNC)
+      // =====================================================================
+      function handleInstantSubmit() {
+        var collected = [];
+        for (var i = 0; i < TOTAL_SLOTS; i++) {
+          if (slotPhotos[i]) {
+            collected.push(slotPhotos[i]);
+          }
+        }
+
+        if (collected.length === 0) {
+          showToast('Pilih atau ambil minimal 1 foto terlebih dahulu!', 'toast-error');
+          return;
+        }
+
+        var ketEl = document.getElementById('inputKeterangan');
+        var keteranganVal = ketEl ? String(ketEl.value || '').replace(/^\s+|\s+$/g, '') : '';
+        var totalBatch = collected.length;
+        var batchId = 'B' + Date.now();
+
+        var newItems = [];
+        for (var j = 0; j < totalBatch; j++) {
+          newItems.push({
+            batchId: batchId,
+            category: selectedCategory,
+            keterangan: keteranganVal,
+            photoIndex: j + 1,
+            totalInBatch: totalBatch,
+            timestamp: collected[j].timestamp,
+            dataUrl: collected[j].dataUrl,
+            status: 'pending',
+            lastError: ''
+          });
+        }
+
+        addQueueItems(newItems, function(err) {
+          if (err) {
+            showToast('Gagal menyimpan ke memori lokal.', 'toast-error');
+            return;
+          }
+
+          // Respon sukses instan tanpa menunggu jaringan
+          showToast('Tersimpan & dikirim di latar belakang (' + totalBatch + ' foto)', 'toast-success');
+
+          // Reset form untuk input berikutnya
+          resetAllSlots();
+          if (ketEl) {
+            ketEl.value = '';
+          }
+
+          refreshQueueUI(function() {
+            triggerBackgroundSync();
+          });
+        });
+      }
+
+      // =====================================================================
+      // PENGIRIMAN KE TELEGRAM (sendMediaGroup / sendPhoto VIA XHR)
+      // =====================================================================
+      function dataUrlToBlobSafe(dataUrl) {
+        var parts = dataUrl.split(',');
+        var mime = 'image/jpeg';
+        if (parts[0] && parts[0].indexOf(':') !== -1) {
+          var mPart = parts[0].split(':')[1].split(';')[0];
+          if (mPart) mime = mPart;
+        }
+        var byteStr = atob(parts[1] || '');
+        var len = byteStr.length;
+        var ab = new ArrayBuffer(len);
+        var ia = new Uint8Array(ab);
+        for (var i = 0; i < len; i++) {
+          ia[i] = byteStr.charCodeAt(i);
+        }
+        try {
+          return new Blob([ab], { type: mime });
+        } catch (eBlob) {
+          // Fallback BlobBuilder untuk Android sangat lama
+          var BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+          if (BlobBuilder) {
+            var bb = new BlobBuilder();
+            bb.append(ab);
+            return bb.getBlob(mime);
+          }
+          throw eBlob;
+        }
+      }
+
+      function buildCaption(item) {
+        var lines = [
+          'DOKUMENTASI OPERASIONAL',
+          'Kategori: ' + item.category,
+          'Foto ke: ' + item.photoIndex + ' dari ' + item.totalInBatch,
+          'Waktu: ' + item.timestamp
+        ];
+        if (item.keterangan) {
+          lines.push('Keterangan: ' + item.keterangan);
+        }
+        return lines.join('\n');
+      }
+
+      function sendPhotoItem(item, callback) {
+        try {
+          var blob = dataUrlToBlobSafe(item.dataUrl);
+          var formData = new FormData();
+          formData.append('chat_id', CHAT_ID);
+          formData.append('photo', blob, 'foto_' + item.photoIndex + '.jpg');
+          formData.append('caption', buildCaption(item));
+
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', SEND_PHOTO_URL, true);
+          xhr.timeout = 45000;
+
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                  var resp = JSON.parse(xhr.responseText);
+                  if (resp && resp.ok) {
+                    callback(true, '');
                     return;
+                  }
+                  callback(false, (resp && resp.description) ? resp.description : 'API Telegram menolak');
+                } catch (eParse) {
+                  callback(false, 'Respon tidak valid');
                 }
-                for (let i = 0; i < fileInput.files.length; i++) {
-                    rawFilesArray.push(fileInput.files[i]);
-                }
+              } else {
+                callback(false, 'HTTP ' + (xhr.status || 'gagal'));
+              }
             }
+          };
 
-            isUploadingInProgress = true;
-            if (btnUpload) {
-                btnUpload.disabled = true;
-                btnUpload.classList.add('opacity-50', 'cursor-not-allowed');
-                btnUpload.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengirim...`;
+          xhr.onerror = function() {
+            callback(false, 'Koneksi terputus');
+          };
+
+          xhr.ontimeout = function() {
+            callback(false, 'Timeout jaringan');
+          };
+
+          xhr.send(formData);
+        } catch (err) {
+          callback(false, err.message || 'Gagal menyiapkan upload');
+        }
+      }
+
+      /**
+       * Mengirim batch >= 2 foto via sendMediaGroup dengan fallback otomatis ke sendPhoto per item
+       */
+      function sendBatchMediaGroupOrFallback(batchItems, onAllDone) {
+        if (batchItems.length < 2 || typeof FormData === 'undefined') {
+          var idxSingle = 0;
+          function nextSingle() {
+            if (idxSingle >= batchItems.length) {
+              onAllDone();
+              return;
             }
-
-            try {
-                detectDeviceAndSpec();
-                const parts = tanggalPilih.split('-');
-                let dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                if (isNaN(dateObj.getTime())) {
-                    dateObj = new Date();
-                }
-
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                const monthNames = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
-                const month = monthNames[dateObj.getMonth()];
-                const year = dateObj.getFullYear();
-                const formattedDateFolder = `${day} ${month} ${year}`;
-
-                let allCompressedFiles = [];
-                const batchStamp = Date.now();
-
-                for (let i = 0; i < rawFilesArray.length; i++) {
-                    const file = rawFilesArray[i];
-                    const base64 = await compressImageAndGetBase64(file, deviceSpec.maxWidth, deviceSpec.quality);
-                    
-                    if (base64) {
-                        allCompressedFiles.push({
-                            fileName: `${kategori}_${batchStamp}_${i + 1}.jpg`,
-                            fileData: base64,
-                            category: kategori,
-                            dateFolder: formattedDateFolder
-                        });
-                    }
-                }
-
-                if (allCompressedFiles.length === 0) {
-                    throw new Error("Gagal memproses file foto yang dipilih.");
-                }
-
-                const CHUNK_SIZE = deviceSpec.chunkSize || 5;
-                const batchGroups = [];
-                for (let i = 0; i < allCompressedFiles.length; i += CHUNK_SIZE) {
-                    batchGroups.push(allCompressedFiles.slice(i, i + CHUNK_SIZE));
-                }
-
-                const uploadBatchGroupId = batchStamp.toString();
-                const syncStartTime = batchStamp;
-                let createdBatches = [];
-
-                for (let i = 0; i < batchGroups.length; i++) {
-                    const reportPayload = {
-                        uploader: currentUser.name,
-                        instansi: instansi,
-                        kategori: kategori,
-                        tanggal: tanggalPilih,
-                        files: batchGroups[i],
-                        syncedToDrive: true,
-                        syncFailed: false,
-                        syncStartTime: syncStartTime,
-                        batchGroupId: uploadBatchGroupId,
-                        batchIndex: i + 1,
-                        totalBatches: batchGroups.length
-                    };
-
-                    const tempId = `local_${syncStartTime}_${i + 1}`;
-                    allGlobalReports.unshift(Object.assign({ id: tempId, createdAt: syncStartTime }, reportPayload));
-                    saveCachedReports(allGlobalReports);
-                    applyReportsListToView(allGlobalReports);
-
-                    createdBatches.push({ tempId: tempId, payload: reportPayload });
-
-                    if (window.addDoc && window.collection && window.db) {
-                        window.addDoc(window.collection(window.db, "laporan_dokumentasi"), {
-                            ...reportPayload,
-                            createdAt: window.serverTimestamp ? window.serverTimestamp() : syncStartTime
-                        }).then(docRef => {
-                            allGlobalReports = allGlobalReports.map(item => item.id === tempId ? Object.assign({}, item, { id: docRef.id, syncedToDrive: true, syncFailed: false }) : item);
-                            saveCachedReports(allGlobalReports);
-                        }).catch(() => {});
-                    }
-                }
-
-                document.getElementById('upload-form').reset();
-                document.getElementById('input-instansi').value = "SPPG KOTA SERANG SERANG SERANG 2";
-                isDateManuallyModified = false;
-                setTodayDate();
-                renderDynamicUploadInputs();
-
-                // Kirim setiap batch ke Drive tepat satu kali saja
-                createdBatches.forEach(item => {
-                    syncToDriveInBackground(item.tempId, item.payload);
-                });
-
-                sendTelegramNotification(currentUser.name, instansi, kategori, allCompressedFiles.length, formattedDateFolder);
-
-                // Hitungan 1, 2, 3 lalu langsung tampilkan notifikasi berhasil terkirim
-                await runUploadCountdown(3);
-
-                Swal.fire({
-                    html: `
-                        <div class="py-4">
-                            <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">
-                                <i class="fa-solid fa-circle-check"></i>
-                            </div>
-                            <h2 class="text-2xl font-bold text-slate-800 mb-2">BERHASIL TERKIRIM!</h2>
-                            <p class="text-sm text-slate-600">Laporan berhasil terkirim.</p>
-                        </div>
-                    `,
-                    showConfirmButton: true,
-                    confirmButtonText: '<i class="fa-solid fa-check mr-1"></i> Oke',
-                    confirmButtonColor: '#2563eb',
-                    customClass: { popup: 'rounded-3xl shadow-2xl border border-slate-100' }
-                });
-
-            } catch (error) {
-                console.error("Gagal Dikirim:", error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Kesalahan Upload',
-                    text: 'Terjadi kesalahan saat memproses foto. Pastikan file gambar valid.',
-                    confirmButtonColor: '#2563eb'
-                });
-            } finally {
-                isUploadingInProgress = false;
-                if (btnUpload) {
-                    btnUpload.disabled = false;
-                    btnUpload.classList.remove('opacity-50', 'cursor-not-allowed');
-                    btnUpload.innerHTML = `<i class="fa-solid fa-upload mr-1"></i> Upload Laporan`;
-                }
-            }
+            var cur = batchItems[idxSingle++];
+            sendPhotoItem(cur, function(ok, errReason) {
+              cur.status = ok ? 'sent' : 'failed';
+              cur.lastError = ok ? '' : errReason;
+              updateQueueItem(cur, nextSingle);
+            });
+          }
+          nextSingle();
+          return;
         }
 
-        async function syncToDriveInBackground(docId, reportPayload) {
-            try {
-                const batchKey = getBatchDriveKey(reportPayload);
-                if (batchKey && sentDriveBatchKeys.has(batchKey)) {
+        try {
+          var formData = new FormData();
+          formData.append('chat_id', CHAT_ID);
+          var mediaArr = [];
+
+          for (var i = 0; i < batchItems.length; i++) {
+            var attachName = 'file_' + i;
+            var blob = dataUrlToBlobSafe(batchItems[i].dataUrl);
+            formData.append(attachName, blob, 'foto_' + batchItems[i].photoIndex + '.jpg');
+
+            var mediaObj = {
+              type: 'photo',
+              media: 'attach://' + attachName
+            };
+            if (i === 0) {
+              mediaObj.caption = 'DOKUMENTASI OPERASIONAL\nKategori: ' + batchItems[i].category +
+                                 '\nJumlah Foto: ' + batchItems[i].totalInBatch +
+                                 '\nWaktu: ' + batchItems[i].timestamp +
+                                 (batchItems[i].keterangan ? '\nKeterangan: ' + batchItems[i].keterangan : '');
+            }
+            mediaArr.push(mediaObj);
+          }
+
+          formData.append('media', JSON.stringify(mediaArr));
+
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', SEND_MEDIA_GROUP_URL, true);
+          xhr.timeout = 60000;
+
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+              var groupOk = false;
+              var groupErr = 'Gagal kirim grup';
+              if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                  var res = JSON.parse(xhr.responseText);
+                  if (res && res.ok) {
+                    groupOk = true;
+                  } else if (res && res.description) {
+                    groupErr = res.description;
+                  }
+                } catch (eP) {
+                  groupErr = 'Respon grup tidak valid';
+                }
+              } else {
+                groupErr = 'HTTP ' + (xhr.status || 'gagal');
+              }
+
+              if (groupOk) {
+                var uIdx = 0;
+                function markSent() {
+                  if (uIdx >= batchItems.length) {
+                    onAllDone();
                     return;
+                  }
+                  batchItems[uIdx].status = 'sent';
+                  batchItems[uIdx].lastError = '';
+                  var target = batchItems[uIdx++];
+                  updateQueueItem(target, markSent);
                 }
-                if (batchKey) {
-                    sentDriveBatchKeys.add(batchKey);
+                markSent();
+              } else {
+                // Fallback ke sendPhoto satu per satu jika sendMediaGroup ditolak/gagal
+                var fIdx = 0;
+                function fallbackSingle() {
+                  if (fIdx >= batchItems.length) {
+                    onAllDone();
+                    return;
+                  }
+                  var item = batchItems[fIdx++];
+                  sendPhotoItem(item, function(ok2, err2) {
+                    item.status = ok2 ? 'sent' : 'failed';
+                    item.lastError = ok2 ? '' : (err2 || groupErr);
+                    updateQueueItem(item, fallbackSingle);
+                  });
                 }
-
-                const payloadToSend = Object.assign({}, reportPayload, {
-                    syncedToDrive: true,
-                    syncFailed: false
-                });
-
-                fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payloadToSend)
-                }).catch(() => {});
-            } catch (syncErr) {
-                // Pertahankan status terkirim tanpa memunculkan status gagal
+                fallbackSingle();
+              }
             }
-        }
+          };
 
-        async function retrySyncGroup(encodedDocIds) {
-            try {
-                const docIds = JSON.parse(decodeURIComponent(encodedDocIds));
-                for (const docId of docIds) {
-                    const targetRep = allGlobalReports.find(r => r.id === docId);
-                    if (targetRep) {
-                        syncToDriveInBackground(docId, Object.assign({}, targetRep, { syncedToDrive: true, syncFailed: false }));
-                    }
-                }
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Terkirim',
-                    text: 'Status laporan sudah terkirim.',
-                    timer: 1200,
-                    showConfirmButton: false
-                });
-            } catch (e) {}
-        }
-
-        function sendTelegramNotification(uploader, instansi, kategori, totalFoto, formattedDateFolder) {
-            const message = `🚨 *LAPORAN DOKUMENTASI KERJA BARU* 🚨\n\n` +
-                            `Uploader: *${uploader}*\n` +
-                            `Instansi: *${instansi}*\n` +
-                            `Kategori: *${kategori}*\n` +
-                            `Tanggal Laporan: *${formattedDateFolder}*\n` +
-                            `Jumlah Foto: *${totalFoto} File*\n` +
-                            `Waktu Input: *${new Date().toLocaleString('id-ID')}*\n\n` +
-                            `Silakan cek dashboard admin untuk melihat rincian arsip foto.`;
-
-            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-            
-            fetch(telegramUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: message,
-                    parse_mode: "Markdown"
-                })
-            }).catch(error => console.error("Gagal Kirim Telegram:", error));
-        }
-
-        function groupReports(docsList) {
-            const grouped = {};
-
-            docsList.forEach(item => {
-                const rawDatePart = item.tanggal ? (item.tanggal.includes('T') ? item.tanggal.split('T')[0] : item.tanggal) : 'no-date';
-                const batchKey = item.batchGroupId || item.syncStartTime || (item.createdAt ? new Date(item.createdAt).getTime() : 'single');
-                const key = `${rawDatePart}_${item.uploader}_${item.instansi}_${item.kategori}_synced_${batchKey}`;
-
-                if (!grouped[key]) {
-                    grouped[key] = {
-                        docIds: [item.id],
-                        uploader: item.uploader,
-                        instansi: item.instansi,
-                        kategori: item.kategori,
-                        tanggal: rawDatePart,
-                        createdAt: item.createdAt,
-                        syncStartTime: item.syncStartTime,
-                        files: item.files ? [...item.files] : [],
-                        syncedToDrive: true,
-                        syncFailed: false
-                    };
-                } else {
-                    grouped[key].docIds.push(item.id);
-                    if (item.files) {
-                        const existingNames = new Set(grouped[key].files.map(f => f && f.fileName).filter(Boolean));
-                        item.files.forEach(f => {
-                            if (!f || !f.fileName || !existingNames.has(f.fileName)) {
-                                grouped[key].files.push(f);
-                                if (f && f.fileName) existingNames.add(f.fileName);
-                            }
-                        });
-                    }
-                    grouped[key].syncedToDrive = true;
-                    grouped[key].syncFailed = false;
-                }
-            });
-
-            return Object.values(grouped);
-        }
-
-        function renderUserArchiveView(filter = {}) {
-            const archiveList = document.getElementById('user-archive-list');
-            if (!archiveList) return;
-
-            let rawList = [];
-            allGlobalReports.forEach(data => {
-                const itemDatePart = data.tanggal ? (data.tanggal.includes('T') ? data.tanggal.split('T')[0] : data.tanggal) : '';
-                
-                if (filter.date && itemDatePart !== filter.date) return;
-                if (filter.kategori && data.kategori !== filter.kategori) return;
-
-                rawList.push(data);
-            });
-
-            const groupedData = groupReports(rawList);
-            groupedData.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
-            
-            checkGlobalSyncStatus();
-
-            let html = "";
-            groupedData.forEach(item => {
-                const parts = item.tanggal ? item.tanggal.split('-') : [];
-                let dateStr = '-';
-                if (parts.length === 3) {
-                    const dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                    dateStr = dObj.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
-                }
-                
-                const syncStatusHtml = `<span class="inline-flex items-center text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-semibold"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Terkirim</span>`;
-
-                html += `
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 flex flex-row justify-between items-center gap-2 shadow-sm hover:border-blue-300 transition">
-                        <div>
-                            <div class="flex items-center space-x-2 mb-1">
-                                <span class="text-xs font-bold uppercase tracking-wide text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-lg">${item.kategori}</span>
-                                ${syncStatusHtml}
-                            </div>
-                            <p class="text-xs text-slate-500"><i class="fa-regular fa-calendar mr-1"></i> ${dateStr} &bull; Diunggah oleh: <b class="text-slate-700">${item.uploader}</b> (${item.files.length} Foto)</p>
-                        </div>
-                    </div>
-                `;
-            });
-
-            document.getElementById('user-count-badge').innerText = `${groupedData.length} Laporan`;
-            archiveList.innerHTML = html;
-
-            if (typeof window.fitDesktopSections === "function") {
-                setTimeout(window.fitDesktopSections, 10);
+          xhr.onerror = function() {
+            var eIdx = 0;
+            function markErr() {
+              if (eIdx >= batchItems.length) {
+                onAllDone();
+                return;
+              }
+              batchItems[eIdx].status = 'failed';
+              batchItems[eIdx].lastError = 'Koneksi terputus';
+              var target = batchItems[eIdx++];
+              updateQueueItem(target, markErr);
             }
-        }
+            markErr();
+          };
 
-        function applyUserFilter() {
-            const dateFilter = document.getElementById('user-filter-date').value;
-            const kategori = document.getElementById('user-filter-kategori').value;
-            renderUserArchiveView({ date: dateFilter, kategori: kategori });
-        }
-
-        function resetUserFilter() {
-            const now = new Date();
-            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-            
-            document.getElementById('user-filter-date').value = todayStr;
-            document.getElementById('user-filter-kategori').value = '';
-            
-            renderUserArchiveView({ date: todayStr });
-        }
-
-        function renderAdminArchiveView(filter = {}) {
-            const tbody = document.getElementById('admin-archive-list');
-            if (!tbody) return;
-
-            let rawList = [];
-            allGlobalReports.forEach(data => {
-                const itemDatePart = data.tanggal ? (data.tanggal.includes('T') ? data.tanggal.split('T')[0] : data.tanggal) : '';
-
-                if (filter.date && itemDatePart !== filter.date) return;
-                if (filter.kategori && data.kategori !== filter.kategori) return;
-
-                rawList.push(data);
-            });
-
-            const groupedData = groupReports(rawList);
-            groupedData.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
-
-            checkGlobalSyncStatus();
-
-            let rows = "";
-            groupedData.forEach(data => {
-                const parts = data.tanggal ? data.tanggal.split('-') : [];
-                let dateFormatted = '-';
-                if (parts.length === 3) {
-                    const dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                    dateFormatted = dObj.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
-                }
-                
-                let photosHtml = `<div class="flex space-x-1 overflow-x-auto py-1 max-w-xs">`;
-                if (data.files && data.files.length > 0) {
-                    data.files.forEach(f => {
-                        if (f.fileData) {
-                            photosHtml += `<img src="${f.fileData}" loading="eager" decoding="async" onclick="openPhotoModal('${f.fileData}', '${f.fileName}')" class="w-12 h-12 object-cover rounded-lg border hover:scale-105 transition cursor-pointer shadow-sm" title="Klik untuk lihat pratinjau jernih">`;
-                        }
-                    });
-                }
-                photosHtml += `</div>`;
-
-                const syncBadge = `<span class="inline-flex items-center text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-medium" title="Berhasil dikirim ke sistem">
-                    <i class="fa-solid fa-circle-check mr-1.5 text-emerald-500"></i> Terkirim
-                 </span>`;
-
-                const safeDocIds = encodeURIComponent(JSON.stringify(data.docIds));
-                const safeFileNames = data.files ? encodeURIComponent(JSON.stringify(data.files.map(f => f.fileName))) : encodeURIComponent(JSON.stringify([]));
-
-                rows += `
-                    <tr class="hover:bg-slate-50/80 transition">
-                        <td class="py-3 px-4 text-xs text-slate-600">${dateFormatted}</td>
-                        <td class="py-3 px-4 font-semibold text-slate-800">
-                            <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs">${data.uploader}</span>
-                        </td>
-                        <td class="py-3 px-4 text-slate-700">${data.instansi}</td>
-                        <td class="py-3 px-4 text-slate-700 font-medium text-xs">${data.kategori}</td>
-                        <td class="py-3 px-4">${photosHtml}</td>
-                        <td class="py-3 px-4 text-center">${syncBadge}</td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="deleteReportGroup('${safeDocIds}', '${data.kategori}', '${safeFileNames}')" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Hapus Laporan & Foto">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            tbody.innerHTML = rows;
-
-            if (typeof window.fitDesktopSections === "function") {
-                setTimeout(window.fitDesktopSections, 10);
+          xhr.ontimeout = function() {
+            var tIdx = 0;
+            function markTime() {
+              if (tIdx >= batchItems.length) {
+                onAllDone();
+                return;
+              }
+              batchItems[tIdx].status = 'failed';
+              batchItems[tIdx].lastError = 'Timeout jaringan';
+              var target = batchItems[tIdx++];
+              updateQueueItem(target, markTime);
             }
-        }
+            markTime();
+          };
 
-        function openPhotoModal(imgSrc, fileName = 'dokumentasi.jpg') {
-            document.getElementById('modal-image-element').src = imgSrc;
-            const downloadBtn = document.getElementById('modal-download-btn');
-            downloadBtn.href = imgSrc;
-            downloadBtn.download = fileName;
-            document.getElementById('photo-modal').classList.remove('hidden');
-        }
-
-        function closePhotoModal() {
-            document.getElementById('photo-modal').classList.add('hidden');
-        }
-
-        async function deleteReportGroup(encodedDocIds, kategori, encodedFileNames) {
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Laporan dan file foto di Sistem akan terhapus permanen!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#e11d48',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try {
-                        let docIds = [];
-                        let fileNames = [];
-                        try {
-                            docIds = JSON.parse(decodeURIComponent(encodedDocIds));
-                            fileNames = JSON.parse(decodeURIComponent(encodedFileNames));
-                        } catch(e) {
-                            docIds = [];
-                            fileNames = [];
-                        }
-
-                        const deletedSet = new Set(docIds);
-                        allGlobalReports = allGlobalReports.filter(item => !deletedSet.has(item.id));
-                        saveCachedReports(allGlobalReports);
-                        applyReportsListToView(allGlobalReports);
-
-                        for (const id of docIds) {
-                            if (id && !String(id).startsWith("local_") && window.deleteDoc && window.doc && window.db) {
-                                await window.deleteDoc(window.doc(window.db, "laporan_dokumentasi", id));
-                            }
-                        }
-
-                        fetch(APPS_SCRIPT_URL, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                action: "delete",
-                                kategori: kategori,
-                                fileNames: fileNames
-                            })
-                        });
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Terhapus!',
-                            text: 'Laporan berhasil dihapus dari sistem.',
-                            confirmButtonColor: '#2563eb',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    } catch (err) {
-                        console.error("Gagal hapus:", err);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: 'Terjadi kesalahan saat menghapus laporan.',
-                            confirmButtonColor: '#2563eb'
-                        });
-                    }
-                }
+          xhr.send(formData);
+        } catch (eGroup) {
+          var sIdx = 0;
+          function fallbackOnCatch() {
+            if (sIdx >= batchItems.length) {
+              onAllDone();
+              return;
+            }
+            var item = batchItems[sIdx++];
+            sendPhotoItem(item, function(ok3, err3) {
+              item.status = ok3 ? 'sent' : 'failed';
+              item.lastError = ok3 ? '' : err3;
+              updateQueueItem(item, fallbackOnCatch);
             });
+          }
+          fallbackOnCatch();
+        }
+      }
+
+      function triggerBackgroundSync() {
+        updateNetworkBadge();
+
+        if (!isOnlineNow()) {
+          refreshQueueUI();
+          return;
         }
 
-        function applyAdminFilter() {
-            const dateFilter = document.getElementById('filter-date').value;
-            const kategori = document.getElementById('filter-kategori').value;
-            renderAdminArchiveView({ date: dateFilter, kategori: kategori });
+        if (isSyncing) {
+          return;
         }
 
-        function resetAdminFilter() {
-            const now = new Date();
-            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-            
-            document.getElementById('filter-date').value = todayStr;
-            document.getElementById('filter-kategori').value = '';
-            
-            renderAdminArchiveView({ date: todayStr });
+        fetchAllQueueItems(function(err, items) {
+          var pendingList = [];
+          for (var i = 0; i < (items || []).length; i++) {
+            if (items[i].status === 'pending') {
+              pendingList.push(items[i]);
+            }
+          }
+
+          if (pendingList.length === 0) {
+            isSyncing = false;
+            refreshQueueUI();
+            return;
+          }
+
+          isSyncing = true;
+
+          // Kelompokkan item pending berdasarkan batchId agar bisa dikirim sebagai album bila >= 2 foto
+          var firstItem = pendingList[0];
+          var sameBatch = [];
+          for (var j = 0; j < pendingList.length; j++) {
+            if (pendingList[j].batchId === firstItem.batchId) {
+              sameBatch.push(pendingList[j]);
+            }
+          }
+
+          sendBatchMediaGroupOrFallback(sameBatch, function() {
+            isSyncing = false;
+            refreshQueueUI(function(info) {
+              if (info.pendingCount > 0 && isOnlineNow()) {
+                setTimeout(triggerBackgroundSync, 700);
+              }
+            });
+          });
+        });
+      }
+
+      // =====================================================================
+      // EVENT LISTENERS & BOOTSTRAP
+      // =====================================================================
+      window.addEventListener('online', function() {
+        updateNetworkBadge();
+        triggerBackgroundSync();
+      });
+
+      window.addEventListener('offline', function() {
+        updateNetworkBadge();
+        refreshQueueUI();
+      });
+
+      setInterval(function() {
+        triggerBackgroundSync();
+      }, 15000);
+
+      function bootstrap() {
+        updateNetworkBadge();
+        initCategories();
+        initSlots();
+        updateSubmitButton();
+
+        var btnKirim = document.getElementById('btnKirim');
+        if (btnKirim) {
+          btnKirim.onclick = handleInstantSubmit;
         }
-    </script>
+
+        var btnManualSync = document.getElementById('btnManualSync');
+        if (btnManualSync) {
+          btnManualSync.onclick = function() {
+            updateNetworkBadge();
+            if (!isOnlineNow()) {
+              showToast('Perangkat Offline. Antrean akan dikirim otomatis saat online.', 'toast-info');
+              return;
+            }
+            showToast('Menyinkronkan antrean foto ke Telegram...', 'toast-info');
+            triggerBackgroundSync();
+          };
+        }
+
+        var btnRetryAll = document.getElementById('btnRetryAll');
+        if (btnRetryAll) {
+          btnRetryAll.onclick = function() {
+            resetFailedToPending(function() {
+              refreshQueueUI(function() {
+                if (!isOnlineNow()) {
+                  showToast('Status gagal diubah ke Menunggu (Offline).', 'toast-info');
+                  return;
+                }
+                showToast('Mencoba kirim ulang foto yang gagal...', 'toast-info');
+                triggerBackgroundSync();
+              });
+            });
+          };
+        }
+
+        var btnClearSent = document.getElementById('btnClearSent');
+        if (btnClearSent) {
+          btnClearSent.onclick = function() {
+            removeSentItems(function() {
+              refreshQueueUI();
+              showToast('Riwayat foto terkirim dibersihkan.', 'toast-info');
+            });
+          };
+        }
+
+        initStorage(function() {
+          refreshQueueUI(function(info) {
+            if (info.pendingCount > 0 && isOnlineNow()) {
+              triggerBackgroundSync();
+            }
+          });
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootstrap);
+      } else {
+        bootstrap();
+      }
+    })();
+  </script>
 </body>
 </html>
